@@ -1,3 +1,5 @@
+import WelcomeScreen from "@/components/diagnostic/welcome-screen";
+
 export default function Home() {
-  return <div>Test Project</div>;
+  return <WelcomeScreen />;
 }
