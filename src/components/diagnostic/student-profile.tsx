@@ -34,6 +34,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Routes } from "@/routes/Routes";
 
 // Form schema with validation
 const formSchema = z.object({
@@ -88,7 +89,7 @@ export default function StudentProfileForm() {
     setIsSubmitting(false);
 
     // Navigate to the next page (the actual diagnostic test)
-    router.push("/diagnostic/test");
+    router.push(Routes.DiagnosticTest);
   };
 
   return (
@@ -159,9 +160,15 @@ export default function StudentProfileForm() {
                   name="firstName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>First Name</FormLabel>
+                      <FormLabel className="text-gray-800">
+                        First Name
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="John" {...field} />
+                        <Input
+                          placeholder="John"
+                          {...field}
+                          className="text-gray-900"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -173,9 +180,13 @@ export default function StudentProfileForm() {
                   name="lastName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Last Name</FormLabel>
+                      <FormLabel className="text-gray-800">Last Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Doe" {...field} />
+                        <Input
+                          placeholder="Doe"
+                          {...field}
+                          className="text-gray-900"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -188,12 +199,15 @@ export default function StudentProfileForm() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email Address</FormLabel>
+                    <FormLabel className="text-gray-800">
+                      Email Address
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="email"
                         placeholder="john.doe@example.com"
                         {...field}
+                        className="text-gray-900"
                       />
                     </FormControl>
                     <FormMessage />
@@ -206,7 +220,7 @@ export default function StudentProfileForm() {
                 name="examDate"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel className="flex items-center gap-2">
+                    <FormLabel className="flex items-center gap-2 text-gray-800">
                       Estimated Exam Date
                       <TooltipProvider>
                         <Tooltip>
@@ -227,7 +241,7 @@ export default function StudentProfileForm() {
                         <FormControl>
                           <Button
                             variant="outline"
-                            className="w-full pl-3 text-left font-normal"
+                            className="w-full pl-3 text-left font-normal text-gray-900"
                           >
                             {field.value ? (
                               format(field.value, "PPP")
@@ -240,17 +254,21 @@ export default function StudentProfileForm() {
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent
+                        className="w-auto p-0 bg-white"
+                        align="start"
+                      >
                         <CalendarComponent
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
                           disabled={(date) => date < new Date()}
                           initialFocus
+                          className="bg-white text-gray-900"
                         />
                       </PopoverContent>
                     </Popover>
-                    <FormDescription>
+                    <FormDescription className="text-gray-600">
                       Choose the date you plan to take the SAT exam
                     </FormDescription>
                     <FormMessage />
@@ -263,7 +281,9 @@ export default function StudentProfileForm() {
                 name="desiredScore"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Desired SAT Score (400-1600)</FormLabel>
+                    <FormLabel className="text-gray-800">
+                      Desired SAT Score (400-1600)
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -273,9 +293,10 @@ export default function StudentProfileForm() {
                         onChange={(e) =>
                           field.onChange(Number.parseInt(e.target.value))
                         }
+                        className="text-gray-900"
                       />
                     </FormControl>
-                    <FormDescription>
+                    <FormDescription className="text-gray-600">
                       What score are you aiming to achieve?
                     </FormDescription>
                     <FormMessage />
@@ -288,17 +309,17 @@ export default function StudentProfileForm() {
                 name="motivation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Motivation (Optional)</FormLabel>
+                    <FormLabel className="text-gray-800">
+                      Motivation (Optional)
+                    </FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="Tell us why you're taking the SAT and what you hope to achieve..."
-                        className="resize-none min-h-[100px]"
+                        className="resize-none min-h-[100px] text-gray-900"
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>
-                      Share your goals and reasons for taking the SAT
-                    </FormDescription>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -316,15 +337,6 @@ export default function StudentProfileForm() {
               </div>
             </form>
           </Form>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 1 }}
-          className="absolute bottom-8 left-0 right-0 text-center text-gray-500 text-sm"
-        >
-          © {new Date().getFullYear()} SAT Diagnostic Test | Helping students
-          succeed
         </motion.div>
       </div>
     </div>
