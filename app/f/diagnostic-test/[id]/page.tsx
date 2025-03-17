@@ -1,25 +1,31 @@
 "use client";
 
-import QuestionView from "@/components/diagnostic/question-view";
-import { Loader } from "@/components/ui/loader";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore";
-import { SupabaseApi } from "@/supabase/SupabaseApi";
-import { useEffect } from "react";
+import { useTimerStore } from "@/stores/useTimerStore";
+import { ClientApi } from "@/supabase/ClientApi";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { useEffect, useTransition } from "react";
 
-type Params = {
-  params: {
-    id: string;
-  };
-};
-export default async function DiagnosticTestPage({ params }: Params) {
-  const { id } = params;
+export default function DiagnosticTestPage() {
+  const { id } = useParams();
 
-  const { setExam, setCurrentQuestion, currentQuestion, examId } =
-    useQuestionControllerStore();
+  const { setExam, examId, exam } = useQuestionControllerStore();
+  const [isPending, startTransition] = useTransition();
+  const { startTimer } = useTimerStore();
+  const router = useRouter();
+  const pathName = usePathname();
 
   useEffect(() => {
     const get = async () => {
-      const { data, error } = await SupabaseApi.getExamById(id);
+      const { data, error } = await ClientApi.getExamById(id as string);
       if (data) {
         setExam(data);
       }
@@ -29,9 +35,33 @@ export default async function DiagnosticTestPage({ params }: Params) {
     }
   }, []);
 
-  if (!currentQuestion) {
-    return <Loader />;
-  }
+  const handleExamStart = () => {
+    startTransition(() => {
+      startTimer();
+      router.push(`${pathName}/q/${exam?.questions[0]}`);
+    });
+  };
 
-  return <QuestionView question={currentQuestion} />;
+  return (
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold text-center">
+          Confirmation
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="text-center">
+        <p className="text-lg mb-4">Are you ready to take the exam?</p>
+      </CardContent>
+      <CardFooter className="flex justify-center space-x-4">
+        <Button
+          onClick={() => handleExamStart()}
+          variant={"outline"}
+          className="w-full transition-all duration-300 ease-in-out"
+          isLoading={isPending}
+        >
+          Yes, I'm ready!
+        </Button>
+      </CardFooter>
+    </Card>
+  );
 }

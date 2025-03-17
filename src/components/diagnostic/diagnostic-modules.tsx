@@ -1,10 +1,11 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ArrowRight, BookOpen, Calculator, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import BackgroundAnimation from "./background-animation";
-import { SupabaseApi } from "@/supabase/SupabaseApi";
+import { ClientApi } from "@/supabase/ClientApi";
 import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore";
 
 const ExamId: Record<string, string> = {
@@ -18,7 +19,7 @@ export default function DiagnosticModules() {
 
   const startModule = async (module: string) => {
     const id = ExamId[module];
-    const { data, error } = await SupabaseApi.getExamById(id);
+    const { data, error } = await ClientApi.getExamById(id);
 
     if (data) {
       setExam(data);
