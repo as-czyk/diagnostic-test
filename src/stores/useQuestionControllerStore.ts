@@ -34,7 +34,7 @@ export const useQuestionControllerStore = create<QuestionControllerStore>(
       set({ examId: exam.id, exam });
     },
 
-    clearCandidatesAndCurrent: () => {
+    clearCurrentQuestion: () => {
       set({
         currentQuestion: null,
       });

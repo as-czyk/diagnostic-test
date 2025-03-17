@@ -12,7 +12,7 @@ import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore"
 import { useTimerStoreWithInitialization } from "@/stores/useTimerStore";
 import { ClientApi } from "@/supabase/ClientApi";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useTransition } from "react";
 
 export default function DiagnosticTestPage() {
   const { id } = useParams();
@@ -21,12 +21,6 @@ export default function DiagnosticTestPage() {
   const { startTimer } = useTimerStoreWithInitialization();
   const router = useRouter();
   const pathName = usePathname();
-  const [isMounted, setIsMounted] = useState(false);
-
-  // Handle client-side mounting
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   useEffect(() => {
     const get = async () => {
@@ -35,10 +29,10 @@ export default function DiagnosticTestPage() {
         setExam(data);
       }
     };
-    if (!examId && isMounted) {
+    if (!examId) {
       get();
     }
-  }, [id, examId, setExam, isMounted]);
+  }, []);
 
   const handleExamStart = () => {
     startTransition(() => {
