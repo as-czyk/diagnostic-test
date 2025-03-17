@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { z } from "zod";
@@ -36,6 +36,10 @@ import {
 } from "@/components/ui/tooltip";
 import { Routes } from "@/routes/Routes";
 import BackgroundAnimation from "./background-animation";
+import { updateUserProfile } from "@/actions/user-actions";
+import { createBrowserClient } from "@supabase/ssr";
+import { createClient } from "@/supabase/client";
+import { SupabaseApi } from "@/supabase/SupabaseApi";
 
 // Form schema with validation
 const formSchema = z.object({
@@ -63,7 +67,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function StudentProfileForm() {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pending, startTransition] = useTransition();
 
   // Initialize the form with default values
   const form = useForm<FormValues>({
@@ -79,19 +83,26 @@ export default function StudentProfileForm() {
 
   // Form submission handler
   const onSubmit = async (data: FormValues) => {
-    setIsSubmitting(true);
+    startTransition(async () => {
+      try {
+        const Supabase = await createClient();
+        const { data: userData, error } = await Supabase.auth.getUser();
+        const result = await updateUserProfile(data, userData.user?.id);
 
-    // Simulate API call or data processing
-    console.log("Form data:", data);
+        if (!result.success) {
+          console.error(result.error);
+          return;
+        }
 
-    // In a real application, you would save this data to your backend
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    setIsSubmitting(false);
-
-    // Navigate to the next page (the actual diagnostic test)
-    router.push(Routes.DiagnosticTest);
+        // Navigate to the next page (the actual diagnostic test)
+        router.push(Routes.DiagnosticTest);
+      } catch (err) {
+        console.error(err);
+      }
+    });
   };
+
+  const isFormValid = form.formState?.isValid;
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-white to-pink-50">
@@ -291,10 +302,11 @@ export default function StudentProfileForm() {
                 <Button
                   type="submit"
                   className="bg-[#DB5461] hover:bg-[#c64854] text-white flex items-center gap-2"
-                  disabled={isSubmitting}
+                  disabled={!isFormValid}
+                  isLoading={pending}
                 >
-                  {isSubmitting ? "Saving..." : "Continue"}
-                  {!isSubmitting && <ArrowRight className="w-4 h-4" />}
+                  Continue
+                  <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>
             </form>

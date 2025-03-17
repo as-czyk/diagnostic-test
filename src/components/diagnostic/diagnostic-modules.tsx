@@ -1,65 +1,36 @@
 "use client";
-import { motion } from "framer-motion";
-import {
-  ArrowLeft,
-  BookOpen,
-  Calculator,
-  Clock,
-  ArrowRight,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { motion } from "framer-motion";
+import { ArrowRight, BookOpen, Calculator, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
+import BackgroundAnimation from "./background-animation";
+import { SupabaseApi } from "@/supabase/SupabaseApi";
+import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore";
+
+const ExamId: Record<string, string> = {
+  math: "5150e1c5-27c4-44a2-8c79-75837be80472",
+  verbal: "e7ff6e6f-4d26-4fbf-a468-04af39f599f9",
+};
 
 export default function DiagnosticModules() {
   const router = useRouter();
+  const { setExam } = useQuestionControllerStore();
 
-  const startModule = (module: string) => {
-    //router.push(`/diagnostic/test/${module}`);
+  const startModule = async (module: string) => {
+    const id = ExamId[module];
+    const { data, error } = await SupabaseApi.getExamById(id);
+
+    if (data) {
+      setExam(data);
+    }
+
+    router.push(`/f/diagnostic-test/${id}`);
   };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-white to-pink-50">
       {/* Animated background elements (same as previous screens for consistency) */}
-      <div className="absolute inset-0 z-0">
-        <motion.div
-          className="absolute top-20 left-10 w-64 h-64 rounded-full bg-pink-100 opacity-40"
-          animate={{
-            x: [0, 30, 0],
-            y: [0, 15, 0],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-pink-100 opacity-50"
-          animate={{
-            x: [0, -20, 0],
-            y: [0, 20, 0],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/3 w-40 h-40 rounded-full bg-pink-200 opacity-30"
-          animate={{
-            x: [0, 40, 0],
-            y: [0, -30, 0],
-          }}
-          transition={{
-            duration: 12,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "easeInOut",
-          }}
-        />
-      </div>
-
+      <BackgroundAnimation />
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-12">
         <motion.div
@@ -196,16 +167,6 @@ export default function DiagnosticModules() {
               </div>
             </motion.div>
           </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 1 }}
-          className="absolute bottom-8 left-0 right-0 text-center text-gray-500 text-sm"
-        >
-          © {new Date().getFullYear()} SAT Diagnostic Test | Helping students
-          succeed
         </motion.div>
       </div>
     </div>

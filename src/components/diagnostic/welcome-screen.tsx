@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,16 +8,34 @@ import Link from "next/link";
 import { Routes } from "@/routes/Routes";
 import BackgroundAnimation from "./background-animation";
 import { useRouter } from "next/navigation";
+import { SupabaseApi } from "@/supabase/SupabaseApi";
 
 export default function WelcomeScreen() {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-
+  const [pending, startTransition] = useTransition();
   useEffect(() => {
     setMounted(true);
   }, []);
 
   if (!mounted) return null;
+
+  const handleClick = async () => {
+    startTransition(async () => {
+      try {
+        const { data: userData, error } = await SupabaseApi.signInAnonymously();
+
+        if (error) {
+          console.error(error);
+          return;
+        }
+
+        router.push(Routes.StudentProfile);
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-white to-pink-50">
@@ -71,8 +89,9 @@ export default function WelcomeScreen() {
 
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
-                onClick={() => router.push(Routes.StudentProfile)}
+                onClick={() => handleClick()}
                 className="px-8 py-6 text-lg font-medium text-white transition-colors bg-[#DB5461] hover:bg-[#c64854] rounded-xl"
+                isLoading={pending}
               >
                 Start Your Diagnostic Test
                 <ArrowRight className="w-5 h-5 ml-2" />
