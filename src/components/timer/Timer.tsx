@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Eye, EyeOff } from "lucide-react";
-import { useTimerStore } from "@/stores/useTimerStore";
+import { useTimerStoreWithInitialization } from "@/stores/useTimerStore";
 import { Constants } from "@/constants/Constants";
 import { formatTime } from "@/utils/formatTime";
 
@@ -15,10 +15,15 @@ interface TimerProps {
 
 export default function Timer(props: TimerProps) {
   const { initialTime, callback = () => {} } = props;
-  const { timer, updateTimer, setTimer, timerIsRunning } = useTimerStore(
-    (state) => state
-  );
+  const { timer, updateTimer, setTimer, timerIsRunning } =
+    useTimerStoreWithInitialization();
   const [isTimeVisible, setIsTimeVisible] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Handle client-side mounting
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!timerIsRunning) return;
@@ -37,11 +42,11 @@ export default function Timer(props: TimerProps) {
     return () => {
       clearInterval(intervalId);
     };
-  }, [timer, timerIsRunning]);
+  }, [timer, timerIsRunning, callback, updateTimer]);
 
   useEffect(() => {
-    if (initialTime) setTimer(initialTime);
-  }, []);
+    if (initialTime && isMounted) setTimer(initialTime);
+  }, [initialTime, isMounted, setTimer]);
 
   const toggleTimeVisibility = () => setIsTimeVisible(!isTimeVisible);
 
@@ -51,6 +56,11 @@ export default function Timer(props: TimerProps) {
     if (percentage <= 0.5) return "from-yellow-100 to white";
     return "from-green-100 to white";
   };
+
+  // Prevent hydration errors by not rendering until mounted
+  if (!isMounted) {
+    return <div className="w-24 h-10"></div>; // Placeholder with same dimensions
+  }
 
   return (
     <Card

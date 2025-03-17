@@ -9,19 +9,24 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore";
-import { useTimerStore } from "@/stores/useTimerStore";
+import { useTimerStoreWithInitialization } from "@/stores/useTimerStore";
 import { ClientApi } from "@/supabase/ClientApi";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useEffect, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 export default function DiagnosticTestPage() {
   const { id } = useParams();
-
   const { setExam, examId, exam } = useQuestionControllerStore();
   const [isPending, startTransition] = useTransition();
-  const { startTimer } = useTimerStore();
+  const { startTimer } = useTimerStoreWithInitialization();
   const router = useRouter();
   const pathName = usePathname();
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Handle client-side mounting
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const get = async () => {
@@ -30,10 +35,10 @@ export default function DiagnosticTestPage() {
         setExam(data);
       }
     };
-    if (!examId) {
+    if (!examId && isMounted) {
       get();
     }
-  }, []);
+  }, [id, examId, setExam, isMounted]);
 
   const handleExamStart = () => {
     startTransition(() => {
@@ -43,7 +48,7 @@ export default function DiagnosticTestPage() {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-center">
           Confirmation

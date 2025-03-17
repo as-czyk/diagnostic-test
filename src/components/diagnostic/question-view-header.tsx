@@ -30,7 +30,6 @@ export default function QuestionViewHeader() {
           <div className="flex items-center space-x-4">
             <Timer />
           </div>
-
           <div className="flex items-center space-x-3">
             <AlertDialog>
               <AlertDialogTrigger asChild>
