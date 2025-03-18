@@ -1,8 +1,10 @@
 "use client";
 
+import { updateDiagnostic } from "@/actions/diagnostic-actions";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ExamId } from "@/constants/Constants";
 import { Routes } from "@/routes/Routes";
 import { useResultStore } from "@/stores";
 import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore";
@@ -84,6 +86,19 @@ export default function QuestionView() {
           examId,
           results
         );
+
+        if (data?.id) {
+          // Determine which diagnostic type to update based on exam ID
+          if (examId === ExamId.math) {
+            await updateDiagnostic({
+              math_diagnostic_id: data.id,
+            });
+          } else {
+            await updateDiagnostic({
+              verbal_diagnostic_id: data.id,
+            });
+          }
+        }
 
         if (error) {
           console.error(error);

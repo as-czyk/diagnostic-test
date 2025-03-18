@@ -85,7 +85,9 @@ export default function StudentProfileForm() {
     startTransition(async () => {
       try {
         const result = await updateUserProfile(data);
-        const diagnostic = await updateDiagnostic(result.userProfileData?.id!);
+        const diagnostic = await updateDiagnostic({
+          user_profile_id: result.userProfileData?.id!,
+        });
 
         if (!result.success || !diagnostic.success) {
           console.error(result.error);

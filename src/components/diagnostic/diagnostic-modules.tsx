@@ -54,6 +54,8 @@ export default function DiagnosticModules() {
     );
   }
 
+  console.log(finishedExams);
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-white to-pink-50">
       {/* Animated background elements (same as previous screens for consistency) */}
@@ -150,7 +152,7 @@ export default function DiagnosticModules() {
             <motion.div
               whileHover={{ y: -5 }}
               className={`bg-white rounded-xl shadow-lg overflow-hidden ${
-                finishedExams.includes(ExamId.verbal) ? "blur-sm" : ""
+                finishedExams.includes(ExamId.math) ? "blur-sm" : ""
               }`}
             >
               <div className="p-6">

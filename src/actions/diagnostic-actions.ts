@@ -2,6 +2,7 @@
 
 import { createSupabaseServerClient } from "./../supabase/server";
 import { Routes } from "@/routes/Routes";
+import { UpdateDiagnostic } from "@/supabase/db/diagnostic";
 import { SupabaseApi } from "@/supabase/SupabaseApi";
 
 export async function SignInAndCreateDiagnosticAction() {
@@ -36,7 +37,7 @@ export async function SignInAndCreateDiagnosticAction() {
   }
 }
 
-export async function updateDiagnostic(userProfileId: string) {
+export async function updateDiagnostic(updateDiagnosticData: UpdateDiagnostic) {
   try {
     const supabase = await createSupabaseServerClient();
     const { data: loggedInUser } = await supabase.auth.getUser();
@@ -45,9 +46,7 @@ export async function updateDiagnostic(userProfileId: string) {
 
     const { data, error } = await SupabaseApi.updateDiagnostic(
       diagnosticData?.id!,
-      {
-        user_profile_id: userProfileId,
-      }
+      updateDiagnosticData
     );
 
     if (error) {
