@@ -1,15 +1,9 @@
-import { User, UserAttributes } from "@supabase/supabase-js";
-import { createClient } from "../client";
+import { createSupabaseServerClient } from "../server";
 
 export const AuthApi = {
   signInAnonymously: async () => {
-    const supabase = createClient();
+    const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase.auth.signInAnonymously();
-    return { data, error };
-  },
-  updateUser: async (user: Partial<User>) => {
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.updateUser(user);
     return { data, error };
   },
 };

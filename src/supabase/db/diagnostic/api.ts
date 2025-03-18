@@ -109,24 +109,15 @@ export async function getDiagnosticByUserId(userId: string): Promise<{
  * @param diagnostic The diagnostic data to create
  * @returns The created diagnostic data or an error
  */
-export async function createDiagnostic(diagnostic: CreateDiagnostic): Promise<{
+export async function createDiagnostic(userId: string): Promise<{
   data: Diagnostic | null;
   error: Error | null;
 }> {
   try {
     const supabase = await createSupabaseServerClient();
-
-    // Check if a diagnostic record already exists for this user
-    const { data: existingDiagnostic } = await getDiagnosticByUserId(
-      diagnostic.user_id
-    );
-
-    if (existingDiagnostic) {
-      return {
-        data: existingDiagnostic,
-        error: null,
-      };
-    }
+    const diagnostic: CreateDiagnostic = {
+      user_id: userId,
+    };
 
     const { data, error } = await supabase
       .from(DIAGNOSTIC_TABLE)

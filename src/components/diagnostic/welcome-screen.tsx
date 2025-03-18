@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { Button } from "@/components/ui/button";
+import { Routes } from "@/routes/Routes";
+import { SupabaseApi } from "@/supabase/SupabaseApi";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Routes } from "@/routes/Routes";
-import BackgroundAnimation from "./background-animation";
 import { useRouter } from "next/navigation";
-import { SupabaseApi } from "@/supabase/SupabaseApi";
+import { useEffect, useState, useTransition } from "react";
+import BackgroundAnimation from "./background-animation";
+import { SignInAndCreateDiagnosticAction } from "@/actions/diagnostic-actions";
 
 export default function WelcomeScreen() {
   const [mounted, setMounted] = useState(false);
@@ -23,16 +23,15 @@ export default function WelcomeScreen() {
   const handleClick = async () => {
     startTransition(async () => {
       try {
-        const { data: userData, error } = await SupabaseApi.signInAnonymously();
-
-        if (error) {
-          console.error(error);
-          return;
+        const result = await SignInAndCreateDiagnosticAction();
+        if (result?.success && result.redirectTo) {
+          router.push(result.redirectTo);
+        } else if (result?.error) {
+          console.error("Error in diagnostic action:", result.error);
+          // You might want to show an error toast or message here
         }
-
-        router.push(Routes.StudentProfile);
       } catch (error) {
-        console.error(error);
+        console.error("Failed to start diagnostic:", error);
       }
     });
   };

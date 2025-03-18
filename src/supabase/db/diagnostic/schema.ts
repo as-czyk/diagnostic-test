@@ -4,11 +4,11 @@ import { z } from "zod";
 export const DiagnosticSchema = z.object({
   id: z.string().uuid(),
   user_id: z.string().uuid(),
-  user_profile_id: z.string().uuid().optional(),
-  math_diagnostic_id: z.string().uuid().optional(),
-  verbal_diagnostic_id: z.string().uuid().optional(),
-  created_at: z.string().datetime().optional(),
-  updated_at: z.string().datetime().optional(),
+  user_profile_id: z.string().nullable().optional(),
+  math_diagnostic_id: z.string().nullable().optional(),
+  verbal_diagnostic_id: z.string().nullable().optional(),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
 });
 export type Diagnostic = z.infer<typeof DiagnosticSchema>;
 

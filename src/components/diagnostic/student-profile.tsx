@@ -1,18 +1,17 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, ArrowRight, Calendar, Info } from "lucide-react";
 import { format } from "date-fns";
-import Link from "next/link";
+import { motion } from "framer-motion";
+import { ArrowRight, Calendar, Info } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
+import { updateUserProfile } from "@/actions/user-actions";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
@@ -22,12 +21,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
@@ -35,11 +35,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Routes } from "@/routes/Routes";
-import BackgroundAnimation from "./background-animation";
-import { updateUserProfile } from "@/actions/user-actions";
-import { createBrowserClient } from "@supabase/ssr";
 import { createClient } from "@/supabase/client";
 import { SupabaseApi } from "@/supabase/SupabaseApi";
+import BackgroundAnimation from "./background-animation";
+import { updateDiagnostic } from "@/actions/diagnostic-actions";
 
 // Form schema with validation
 const formSchema = z.object({
@@ -85,9 +84,8 @@ export default function StudentProfileForm() {
   const onSubmit = async (data: FormValues) => {
     startTransition(async () => {
       try {
-        const Supabase = await createClient();
-        const { data: userData, error } = await Supabase.auth.getUser();
-        const result = await updateUserProfile(data, userData.user?.id);
+        const result = await updateUserProfile(data);
+        const diagnostic = await updateDiagnostic();
 
         if (!result.success) {
           console.error(result.error);

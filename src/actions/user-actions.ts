@@ -16,17 +16,15 @@ type UpdateUserProfileInput = {
 /**
  * Server action to update a user's profile
  */
-export async function updateUserProfile(
-  data: UpdateUserProfileInput,
-  userId: string | undefined
-) {
+export async function updateUserProfile(data: UpdateUserProfileInput) {
   try {
     // Get the server-side Supabase client
     const supabase = await createSupabaseAdminClient();
+    const { data: loggedInUser } = await supabase.auth.getUser();
 
     // Update the user metadata and email
     const { data: userData, error } = await supabase.auth.admin.updateUserById(
-      userId ?? "",
+      loggedInUser?.user?.id ?? "",
       {
         user_metadata: {
           first_name: data.firstName,
