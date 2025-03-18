@@ -16,11 +16,7 @@ import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore"
 import { useEffect, useState, useTransition } from "react";
 import { Loader } from "../ui/loader";
 import { Badge } from "../ui/badge";
-
-const ExamId: Record<string, string> = {
-  math: "5150e1c5-27c4-44a2-8c79-75837be80472",
-  verbal: "e7ff6e6f-4d26-4fbf-a468-04af39f599f9",
-};
+import { ExamId } from "@/constants/Constants";
 
 export default function DiagnosticModules() {
   const router = useRouter();
@@ -57,8 +53,6 @@ export default function DiagnosticModules() {
       </div>
     );
   }
-
-  console.log(finishedExams);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-white to-pink-50">
@@ -100,12 +94,7 @@ export default function DiagnosticModules() {
                   <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center mb-4">
                     <BookOpen className="w-6 h-6 text-[#DB5461]" />
                   </div>
-                  {finishedExams.includes(ExamId.verbal) && (
-                    <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-                      <CheckCircle className="w-3 h-3 mr-1" />
-                      Completed
-                    </Badge>
-                  )}
+
                   <h2 className="text-xl font-bold text-gray-900 mb-2">
                     Evidence-Based Reading & Writing
                   </h2>
@@ -160,7 +149,9 @@ export default function DiagnosticModules() {
             {/* Math Module Card */}
             <motion.div
               whileHover={{ y: -5 }}
-              className="bg-white rounded-xl shadow-lg overflow-hidden"
+              className={`bg-white rounded-xl shadow-lg overflow-hidden ${
+                finishedExams.includes(ExamId.verbal) ? "blur-sm" : ""
+              }`}
             >
               <div className="p-6">
                 <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center mb-4">
@@ -206,6 +197,7 @@ export default function DiagnosticModules() {
                   </ul>
                   <Button
                     onClick={() => startModule("math")}
+                    disabled={finishedExams.includes(ExamId.math)}
                     className="w-full bg-[#DB5461] hover:bg-[#c64854] text-white flex items-center justify-center gap-2"
                   >
                     Start Math Section

@@ -1,12 +1,10 @@
 import { createSupabaseServerClient } from "../../server";
-import { createSupabaseAdminClient } from "../../admin";
 import {
-  ExamResult,
-  ExamResultSchema,
   CreateExamResult,
-  UpdateExamResult,
   EXAM_RESULT_TABLE,
+  ExamResult,
   ExamResultData,
+  ExamResultSchema,
 } from "./schema";
 
 /**
@@ -199,57 +197,6 @@ export async function createExamResult(examResult: CreateExamResult): Promise<{
     return { data: validationResult.data, error: null };
   } catch (error) {
     console.error("Error creating exam result:", error);
-    return {
-      data: null,
-      error:
-        error instanceof Error
-          ? error
-          : new Error("An unexpected error occurred"),
-    };
-  }
-}
-
-/**
- * Update an existing exam result
- * @param id The ID of the exam result to update
- * @param examResult The exam result data to update
- * @returns The updated exam result data or an error
- */
-export async function updateExamResult(
-  id: string,
-  examResult: UpdateExamResult
-): Promise<{
-  data: ExamResult | null;
-  error: Error | null;
-}> {
-  try {
-    const supabase = await createSupabaseServerClient();
-
-    const { data, error } = await supabase
-      .from(EXAM_RESULT_TABLE)
-      .update(examResult)
-      .eq("id", id)
-      .select()
-      .single();
-
-    if (error) {
-      return { data: null, error: new Error(error.message) };
-    }
-
-    // Validate the data against the schema
-    const validationResult = ExamResultSchema.safeParse(data);
-    if (!validationResult.success) {
-      return {
-        data: null,
-        error: new Error(
-          `Invalid exam result data: ${validationResult.error.message}`
-        ),
-      };
-    }
-
-    return { data: validationResult.data, error: null };
-  } catch (error) {
-    console.error("Error updating exam result:", error);
     return {
       data: null,
       error:
