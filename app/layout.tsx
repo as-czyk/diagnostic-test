@@ -28,12 +28,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        <footer>
-          <div className="absolute bottom-8 left-0 right-0 text-center text-gray-700 text-sm">
-            © {new Date().getFullYear()} SAT Diagnostic Test | Helping students
-            succeed
-          </div>
-        </footer>
       </body>
     </html>
   );
