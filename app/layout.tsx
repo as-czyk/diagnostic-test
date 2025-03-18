@@ -29,7 +29,7 @@ export default function RootLayout({
       >
         {children}
         <footer>
-          <div className="absolute bottom-8 left-0 right-0 text-center text-gray-500 text-sm">
+          <div className="absolute bottom-8 left-0 right-0 text-center text-gray-700 text-sm">
             © {new Date().getFullYear()} SAT Diagnostic Test | Helping students
             succeed
           </div>
