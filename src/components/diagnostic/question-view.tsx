@@ -3,18 +3,45 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Routes } from "@/routes/Routes";
 import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore";
+import { ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function QuestionView() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const { currentQuestion } = useQuestionControllerStore();
+  const {
+    currentQuestion,
+    getNextQuestionId,
+    examId,
+    exam,
+    getCurrentQuestionIndex,
+  } = useQuestionControllerStore();
+  const router = useRouter();
+
+  const isLastQuestion =
+    getCurrentQuestionIndex() === exam?.questions.length - 1;
 
   // Handle answer selection
   const handleOptionSelect = (optionId: string) => setSelectedOption(optionId);
 
   // Handle next question
-  const handleNextQuestion = () => {};
+  const handleNextQuestion = () => {
+    const nextQuestionId = getNextQuestionId();
+
+    if (isLastQuestion) {
+      router.push(Routes.DiagnosticTest);
+
+      return;
+    }
+
+    if (nextQuestionId) {
+      router.push(`/f/diagnostic-test/${examId}/q/${nextQuestionId}`);
+    }
+  };
+
+  console.log(isLastQuestion);
 
   return (
     <div className="flex flex-col">
@@ -72,15 +99,14 @@ export default function QuestionView() {
           className="bg-[#DB5461] hover:bg-[#c64854] text-white flex items-center gap-2"
           disabled={!selectedOption}
         >
-          Continue
-          {/*questionNumber < totalQuestions ? (
-                <>
-                  Next
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              ) : (
-                "Finish Section"
-              )*/}
+          {!isLastQuestion ? (
+            <>
+              Submit
+              <ArrowRight className="w-4 h-4" />
+            </>
+          ) : (
+            "Finish Section"
+          )}
         </Button>
       </div>
     </div>

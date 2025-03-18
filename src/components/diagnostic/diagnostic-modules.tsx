@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import BackgroundAnimation from "./background-animation";
 import { ClientApi } from "@/supabase/ClientApi";
 import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore";
+import { useTransition } from "react";
+import { Loader } from "../ui/loader";
 
 const ExamId: Record<string, string> = {
   math: "5150e1c5-27c4-44a2-8c79-75837be80472",
@@ -17,16 +19,28 @@ export default function DiagnosticModules() {
   const router = useRouter();
   const { setExam } = useQuestionControllerStore();
 
+  const [pending, startTransition] = useTransition();
+
   const startModule = async (module: string) => {
-    const id = ExamId[module];
-    const { data, error } = await ClientApi.getExamById(id);
+    startTransition(async () => {
+      const id = ExamId[module];
+      const { data, error } = await ClientApi.getExamById(id);
 
-    if (data) {
-      setExam(data);
-    }
+      if (data) {
+        setExam(data);
+      }
 
-    router.push(`/f/diagnostic-test/${id}`);
+      router.push(`/f/diagnostic-test/${id}`);
+    });
   };
+
+  if (pending) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader />
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-white to-pink-50">
