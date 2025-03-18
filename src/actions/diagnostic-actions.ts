@@ -36,9 +36,28 @@ export async function SignInAndCreateDiagnosticAction() {
   }
 }
 
-export async function updateDiagnostic() {
+export async function updateDiagnostic(userProfileId: string) {
   try {
     const supabase = await createSupabaseServerClient();
     const { data: loggedInUser } = await supabase.auth.getUser();
-  } catch (e) {}
+    const { data: diagnosticData, error: diagnosticError } =
+      await SupabaseApi.getDiagnosticByUserId(loggedInUser?.user?.id!);
+
+    const { data, error } = await SupabaseApi.updateDiagnostic(
+      diagnosticData?.id!,
+      {
+        user_profile_id: userProfileId,
+      }
+    );
+
+    if (error) {
+      console.error("Update diagnostic error:", error);
+      return { success: false, error: "Failed to update diagnostic" };
+    }
+
+    return { success: true };
+  } catch (e) {
+    console.error("Unexpected error:", e);
+    return { success: false, error: "An unexpected error occurred" };
+  }
 }
