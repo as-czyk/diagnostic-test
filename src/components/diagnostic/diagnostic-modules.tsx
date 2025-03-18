@@ -2,13 +2,20 @@
 
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ArrowRight, BookOpen, Calculator, Clock } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  Calculator,
+  CheckCircle,
+  Clock,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import BackgroundAnimation from "./background-animation";
 import { ClientApi } from "@/supabase/ClientApi";
 import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore";
-import { useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Loader } from "../ui/loader";
+import { Badge } from "../ui/badge";
 
 const ExamId: Record<string, string> = {
   math: "5150e1c5-27c4-44a2-8c79-75837be80472",
@@ -18,8 +25,17 @@ const ExamId: Record<string, string> = {
 export default function DiagnosticModules() {
   const router = useRouter();
   const { setExam } = useQuestionControllerStore();
+  const [finishedExams, setFinishedExams] = useState<string[]>([]);
 
   const [pending, startTransition] = useTransition();
+
+  useEffect(() => {
+    const get = async () => {
+      const { data, error } = await ClientApi.getExamsForUser();
+      setFinishedExams(data?.map((exam) => exam.id) ?? []);
+    };
+    get();
+  }, []);
 
   const startModule = async (module: string) => {
     startTransition(async () => {
@@ -41,6 +57,8 @@ export default function DiagnosticModules() {
       </div>
     );
   }
+
+  console.log(finishedExams);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-white to-pink-50">
@@ -69,57 +87,72 @@ export default function DiagnosticModules() {
             {/* Verbal Module Card */}
             <motion.div
               whileHover={{ y: -5 }}
-              className="bg-white rounded-xl shadow-lg overflow-hidden"
+              className={`bg-white rounded-xl shadow-lg overflow-hidden ${
+                finishedExams.includes(ExamId.verbal) ? "blur-sm" : ""
+              }`}
             >
-              <div className="p-6">
-                <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center mb-4">
-                  <BookOpen className="w-6 h-6 text-[#DB5461]" />
-                </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">
-                  Evidence-Based Reading & Writing
-                </h2>
-                <p className="text-gray-600 mb-4">
-                  Assess your reading comprehension, grammar, and writing skills
-                  through a series of passages and questions.
-                </p>
-                <div className="flex items-center text-gray-500 mb-6">
-                  <Clock className="w-4 h-4 mr-2" />
-                  <span>Estimated time: 20 minutes</span>
-                </div>
-                <div className="flex flex-col space-y-2">
-                  <ul className="space-y-2 mb-4">
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-[#DB5461] text-white mt-0.5">
-                        <span className="text-xs">✓</span>
-                      </div>
-                      <span className="ml-2 text-gray-600 text-sm">
-                        Reading comprehension
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-[#DB5461] text-white mt-0.5">
-                        <span className="text-xs">✓</span>
-                      </div>
-                      <span className="ml-2 text-gray-600 text-sm">
-                        Grammar & language usage
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-[#DB5461] text-white mt-0.5">
-                        <span className="text-xs">✓</span>
-                      </div>
-                      <span className="ml-2 text-gray-600 text-sm">
-                        Vocabulary in context
-                      </span>
-                    </li>
-                  </ul>
-                  <Button
-                    onClick={() => startModule("verbal")}
-                    className="w-full bg-[#DB5461] hover:bg-[#c64854] text-white flex items-center justify-center gap-2"
-                  >
-                    Start Verbal Section
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
+              <div className="p-6 relative">
+                {/* Add a semi-transparent overlay */}
+                <div className="absolute inset-0 backdrop-blur-sm bg-white/40 z-0"></div>
+
+                {/* Card content with higher z-index */}
+                <div className="relative z-10">
+                  <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center mb-4">
+                    <BookOpen className="w-6 h-6 text-[#DB5461]" />
+                  </div>
+                  {finishedExams.includes(ExamId.verbal) && (
+                    <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      Completed
+                    </Badge>
+                  )}
+                  <h2 className="text-xl font-bold text-gray-900 mb-2">
+                    Evidence-Based Reading & Writing
+                  </h2>
+                  <p className="text-gray-600 mb-4">
+                    Assess your reading comprehension, grammar, and writing
+                    skills through a series of passages and questions.
+                  </p>
+                  <div className="flex items-center text-gray-500 mb-6">
+                    <Clock className="w-4 h-4 mr-2" />
+                    <span>Estimated time: 20 minutes</span>
+                  </div>
+                  <div className="flex flex-col space-y-2">
+                    <ul className="space-y-2 mb-4">
+                      <li className="flex items-start">
+                        <div className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-[#DB5461] text-white mt-0.5">
+                          <span className="text-xs">✓</span>
+                        </div>
+                        <span className="ml-2 text-gray-600 text-sm">
+                          Reading comprehension
+                        </span>
+                      </li>
+                      <li className="flex items-start">
+                        <div className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-[#DB5461] text-white mt-0.5">
+                          <span className="text-xs">✓</span>
+                        </div>
+                        <span className="ml-2 text-gray-600 text-sm">
+                          Grammar & language usage
+                        </span>
+                      </li>
+                      <li className="flex items-start">
+                        <div className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-[#DB5461] text-white mt-0.5">
+                          <span className="text-xs">✓</span>
+                        </div>
+                        <span className="ml-2 text-gray-600 text-sm">
+                          Vocabulary in context
+                        </span>
+                      </li>
+                    </ul>
+                    <Button
+                      disabled={finishedExams.includes(ExamId.verbal)}
+                      onClick={() => startModule("verbal")}
+                      className="w-full bg-[#DB5461] hover:bg-[#c64854] text-white flex items-center justify-center gap-2"
+                    >
+                      Start Verbal Section
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </motion.div>

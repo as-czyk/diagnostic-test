@@ -7,6 +7,7 @@ import { Routes } from "@/routes/Routes";
 import { useResultStore } from "@/stores";
 import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore";
 import { useTimerStore } from "@/stores/useTimerStore";
+import { ClientApi } from "@/supabase/ClientApi";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
@@ -25,7 +26,7 @@ export default function QuestionView() {
     clearCurrentQuestion,
   } = useQuestionControllerStore();
 
-  const { addResult } = useResultStore();
+  const { addResult, getResults } = useResultStore();
 
   const { resetTimerStore } = useTimerStore();
   const router = useRouter();
@@ -57,7 +58,7 @@ export default function QuestionView() {
   const handleOptionSelect = (optionId: string) => setSelectedOption(optionId);
 
   // Handle next question
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     const nextQuestionId = getNextQuestionId();
 
     // Stop timer
@@ -65,12 +66,30 @@ export default function QuestionView() {
       clearInterval(timerRef.current);
     }
 
+    addResult({
+      question_id: currentQuestion?.id,
+      user_answer: selectedOption,
+      time_taken: questionTimer,
+      is_correct: selectedOption === currentQuestion?.correct_answer,
+    });
+
     try {
       if (isLastQuestion) {
         clearCurrentQuestion();
         resetTimerStore();
-        router.push(Routes.DiagnosticTest);
 
+        const results = getResults();
+
+        const { data, error } = await ClientApi.createExamResult(
+          examId,
+          results
+        );
+
+        if (error) {
+          console.error(error);
+        }
+
+        router.push(Routes.DiagnosticTest);
         return;
       }
 
@@ -79,13 +98,6 @@ export default function QuestionView() {
       }
     } catch (e) {
       console.error(e);
-    } finally {
-      addResult({
-        questionId: currentQuestion?.id,
-        correctAnswer: currentQuestion?.answer,
-        userAnswer: selectedOption,
-        timeTaken: questionTimer,
-      });
     }
   };
 

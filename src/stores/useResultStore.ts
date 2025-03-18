@@ -3,20 +3,20 @@ import { create } from "zustand";
 // Types for the state
 type ResultState = {
   results: {
-    questionId: string;
-    correctAnswer: string;
-    userAnswer: string | null;
-    timeTaken: number;
+    question_id: string;
+    user_answer: string | null;
+    time_taken: number;
+    is_correct: boolean;
   }[];
 };
 
 // Types for the actions
 type ResultActions = {
   addResult: (result: {
-    questionId: string;
-    correctAnswer: string;
-    userAnswer: string | null;
-    timeTaken: number;
+    question_id: string;
+    user_answer: string | null;
+    time_taken: number;
+    is_correct: boolean;
   }) => void;
   clearResults: () => void;
   getResults: () => ResultState["results"];
