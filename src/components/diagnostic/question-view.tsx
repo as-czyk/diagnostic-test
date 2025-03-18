@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Routes } from "@/routes/Routes";
 import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore";
+import { useTimerStore } from "@/stores/useTimerStore";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -17,7 +18,10 @@ export default function QuestionView() {
     examId,
     exam,
     getCurrentQuestionIndex,
+    clearCurrentQuestion,
   } = useQuestionControllerStore();
+
+  const { resetTimerStore } = useTimerStore();
   const router = useRouter();
 
   const isLastQuestion =
@@ -31,6 +35,8 @@ export default function QuestionView() {
     const nextQuestionId = getNextQuestionId();
 
     if (isLastQuestion) {
+      clearCurrentQuestion();
+      resetTimerStore();
       router.push(Routes.DiagnosticTest);
 
       return;
@@ -40,8 +46,6 @@ export default function QuestionView() {
       router.push(`/f/diagnostic-test/${examId}/q/${nextQuestionId}`);
     }
   };
-
-  console.log(isLastQuestion);
 
   return (
     <div className="flex flex-col">

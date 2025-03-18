@@ -10,11 +10,12 @@ type QuestionControllerState = {
 
 type QuestionControllerActions = {
   setCurrentQuestion: (q: any) => void;
-  resetCurrentQuestion: () => void;
+  clearCurrentQuestion: () => void;
   clearStore: () => void;
   setExam: (exam: any) => void;
   getNextQuestionId: () => string | null;
   getCurrentQuestionIndex: () => number;
+  getTotalQuestions: () => number;
 };
 
 type QuestionControllerStore = QuestionControllerState &
@@ -60,8 +61,8 @@ export const useQuestionControllerStore = create<QuestionControllerStore>(
     getCurrentQuestionIndex: () => {
       const { currentQuestion, exam } = get();
 
-      return exam.questions.findIndex(
-        (qId: string) => qId === currentQuestion.id
+      return exam?.questions?.findIndex(
+        (qId: string) => qId === currentQuestion?.id
       );
     },
 
@@ -69,6 +70,12 @@ export const useQuestionControllerStore = create<QuestionControllerStore>(
       set({
         currentQuestion: null,
       });
+    },
+
+    getTotalQuestions: () => {
+      const { exam } = get();
+
+      return exam?.questions?.length;
     },
 
     clearStore: () => {

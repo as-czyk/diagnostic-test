@@ -1,8 +1,8 @@
 "use client";
 
-import { Progress } from "@radix-ui/react-progress";
+import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore";
 import { SkipForward } from "lucide-react";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Timer from "../timer/Timer";
 import {
   AlertDialog,
@@ -16,12 +16,25 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
-
 export default function QuestionViewHeader() {
-  const [progress, setProgress] = useState((3 / 20) * 100);
+  const {
+    getCurrentQuestionIndex,
+    getTotalQuestions,
+    currentQuestion,
+    getNextQuestionId,
+    examId,
+  } = useQuestionControllerStore((state) => state);
+
+  const router = useRouter();
 
   // Handle skip question
-  const handleSkipQuestion = () => {};
+  const handleSkipQuestion = () => {
+    const nextQuestionId = getNextQuestionId();
+
+    if (nextQuestionId) {
+      router.push(`/f/diagnostic-test/${examId}/q/${nextQuestionId}`);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-20 bg-white shadow-sm">
@@ -36,7 +49,7 @@ export default function QuestionViewHeader() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-gray-500 flex items-center gap-1"
+                  className="flex items-center gap-1"
                 >
                   <SkipForward className="w-4 h-4" />
                   <span className="hidden sm:inline">Skip</span>
@@ -46,9 +59,7 @@ export default function QuestionViewHeader() {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Skip this question?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    You can return to skipped questions later if time permits.
-                    Skipped questions will not count toward your score unless
-                    answered.
+                    If you do not know the answer, you can skip this question.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -64,10 +75,16 @@ export default function QuestionViewHeader() {
 
         <div className="mt-2">
           <div className="flex justify-between text-xs text-gray-500 mb-1">
-            <span>Question 1 of 12</span>
-            <span>{Math.round(progress)}% Complete</span>
+            {currentQuestion && (
+              <>
+                <span>
+                  {`Question ${
+                    getCurrentQuestionIndex() + 1
+                  } of ${getTotalQuestions()}`}
+                </span>
+              </>
+            )}
           </div>
-          <Progress value={progress} className="h-1.5" />
         </div>
       </div>
     </header>
