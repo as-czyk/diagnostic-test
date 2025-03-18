@@ -87,6 +87,10 @@ export default function QuestionView() {
           results
         );
 
+        const { data: exams, error: examError } =
+          await ClientApi.getExamsForUser();
+        const examArray = exams?.map((exam) => exam.id) ?? [];
+
         if (data?.id) {
           // Determine which diagnostic type to update based on exam ID
           if (examId === ExamId.math) {
@@ -102,6 +106,14 @@ export default function QuestionView() {
 
         if (error) {
           console.error(error);
+        }
+
+        if (
+          examArray?.includes(ExamId.math) &&
+          examArray?.includes(ExamId.verbal)
+        ) {
+          router.push(Routes.GenerateResult);
+          return;
         }
 
         router.push(Routes.DiagnosticTest);

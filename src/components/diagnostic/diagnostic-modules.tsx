@@ -1,22 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import {
-  ArrowRight,
-  BookOpen,
-  Calculator,
-  CheckCircle,
-  Clock,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import BackgroundAnimation from "./background-animation";
-import { ClientApi } from "@/supabase/ClientApi";
+import { ExamId } from "@/constants/Constants";
 import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore";
+import { ClientApi } from "@/supabase/ClientApi";
+import { motion } from "framer-motion";
+import { ArrowRight, BookOpen, Calculator, Clock } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { Loader } from "../ui/loader";
-import { Badge } from "../ui/badge";
-import { ExamId } from "@/constants/Constants";
+import BackgroundAnimation from "./background-animation";
 
 export default function DiagnosticModules() {
   const router = useRouter();
