@@ -4,14 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Routes } from "@/routes/Routes";
+import { useResultStore } from "@/stores";
 import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore";
 import { useTimerStore } from "@/stores/useTimerStore";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function QuestionView() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [questionTimer, setQuestionTimer] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
   const {
     currentQuestion,
     getNextQuestionId,
@@ -21,11 +25,33 @@ export default function QuestionView() {
     clearCurrentQuestion,
   } = useQuestionControllerStore();
 
+  const { addResult } = useResultStore();
+
   const { resetTimerStore } = useTimerStore();
   const router = useRouter();
 
   const isLastQuestion =
     getCurrentQuestionIndex() === exam?.questions.length - 1;
+
+  // Start timer when component mounts
+  useEffect(() => {
+    // Start timer
+    timerRef.current = setInterval(() => {
+      setQuestionTimer((prev) => prev + 1);
+    }, 1000);
+
+    // Reset timer when unmounting
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
+
+  // Reset timer when question changes
+  useEffect(() => {
+    setQuestionTimer(0);
+  }, [currentQuestion?.id]);
 
   // Handle answer selection
   const handleOptionSelect = (optionId: string) => setSelectedOption(optionId);
@@ -34,16 +60,32 @@ export default function QuestionView() {
   const handleNextQuestion = () => {
     const nextQuestionId = getNextQuestionId();
 
-    if (isLastQuestion) {
-      clearCurrentQuestion();
-      resetTimerStore();
-      router.push(Routes.DiagnosticTest);
-
-      return;
+    // Stop timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
     }
 
-    if (nextQuestionId) {
-      router.push(`/f/diagnostic-test/${examId}/q/${nextQuestionId}`);
+    try {
+      if (isLastQuestion) {
+        clearCurrentQuestion();
+        resetTimerStore();
+        router.push(Routes.DiagnosticTest);
+
+        return;
+      }
+
+      if (nextQuestionId) {
+        router.push(`/f/diagnostic-test/${examId}/q/${nextQuestionId}`);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      addResult({
+        questionId: currentQuestion?.id,
+        correctAnswer: currentQuestion?.answer,
+        userAnswer: selectedOption,
+        timeTaken: questionTimer,
+      });
     }
   };
 

@@ -1,6 +1,8 @@
 "use client";
 
 import { create } from "zustand";
+import { BrowserSessionStore } from "./BrowserSessionStore";
+import { SessionKeys } from "@/constants/SessionKeys";
 
 type QuestionControllerState = {
   currentQuestion: any | null;
@@ -29,10 +31,11 @@ export const useQuestionControllerStore = create<QuestionControllerStore>(
     resetCurrentQuestion: () => set({ currentQuestion: null }),
 
     /* Id of the exam that is currently being taken */
-    examId: "",
+    examId: BrowserSessionStore.get(SessionKeys.EXAM_ID) ?? "",
     exam: null,
 
     setExam: (exam: any) => {
+      BrowserSessionStore.set(SessionKeys.EXAM_ID, exam.id);
       set({ examId: exam.id, exam });
     },
 
@@ -80,7 +83,7 @@ export const useQuestionControllerStore = create<QuestionControllerStore>(
 
     clearStore: () => {
       //BrowserSessionStore.remove(SessionKeys.QUESTION_IN_EXAM);
-      //BrowserSessionStore.remove(SessionKeys.EXAM_ID);
+      BrowserSessionStore.remove(SessionKeys.EXAM_ID);
       set({
         currentQuestion: null,
         examId: "",
