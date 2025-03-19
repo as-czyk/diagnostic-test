@@ -20,7 +20,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       >
         <Sidebar />
       </nav>
-      <main className="col-start-2 col-end-8 row-start-2 row-end-8">
+      <main className="col-start-2 col-end-8 row-start-2 row-end-8 mt-8">
         {children}
       </main>
     </main>

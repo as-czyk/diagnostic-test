@@ -55,6 +55,39 @@ export async function getDiagnosticById(id: string): Promise<{
 }
 
 /**
+ * Get a diagnostic record by ID
+ * @param id The ID of the diagnostic record to get
+ * @returns The diagnostic data or an error
+ */
+export async function getDiagnostics(): Promise<{
+  data: Diagnostic[] | null;
+  error: Error | null;
+}> {
+  try {
+    const supabase = await createSupabaseServerClient();
+
+    const { data, error } = await supabase.from(DIAGNOSTIC_TABLE).select("*");
+
+    if (error) {
+      return { data: null, error: new Error(error.message) };
+    }
+
+    console.log(data);
+
+    return { data: data as Diagnostic[], error: null };
+  } catch (error) {
+    console.error("Error getting diagnostic:", error);
+    return {
+      data: null,
+      error:
+        error instanceof Error
+          ? error
+          : new Error("An unexpected error occurred"),
+    };
+  }
+}
+
+/**
  * Get a diagnostic record by user ID
  * @param userId The user ID to get the diagnostic for
  * @returns The diagnostic data or an error
