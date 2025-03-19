@@ -38,14 +38,15 @@ export default function ProcessIndicator({
 
       {/* Animated Progress Bar */}
       <motion.div
-        className="absolute top-1/2 left-0 h-0.5 bg-[#DB5461] -translate-y-1/2"
-        initial={{ width: "0%" }}
-        animate={{ width: `${progressPercentage}%` }}
+        className="absolute top-1/2 bg-[#DB5461]"
+        style={{ width: `${progressPercentage}%` }}
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
       />
 
       {/* Steps */}
-      <div className="relative flex justify-between">
+      <div className="relative flex justify-between ">
         {steps.map((step) => {
           const isCompleted =
             completedSteps[step.id as keyof typeof completedSteps];

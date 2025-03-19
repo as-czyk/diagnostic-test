@@ -1,6 +1,7 @@
 "use server";
 
 import { createSupabaseAdminClient } from "@/supabase/admin";
+import { createSupabaseServerClient } from "@/supabase/server";
 import { SupabaseApi } from "@/supabase/SupabaseApi";
 
 // Define the input type for the updateUserProfile action
@@ -64,4 +65,33 @@ export async function updateUserProfile(data: UpdateUserProfileInput) {
         error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
+}
+
+export async function loginAction(
+  email: string,
+  password: string
+): Promise<any> {
+  console.log("loginAction", email, password);
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    return JSON.stringify({
+      success: false,
+      data: {
+        msg: error.message,
+        name: error.name,
+        status: error?.status,
+      },
+    });
+  }
+
+  return JSON.stringify({
+    success: true,
+    data: data.user,
+    token: data.session?.access_token,
+  });
 }

@@ -72,8 +72,6 @@ export async function getDiagnostics(): Promise<{
       return { data: null, error: new Error(error.message) };
     }
 
-    console.log(data);
-
     return { data: data as Diagnostic[], error: null };
   } catch (error) {
     console.error("Error getting diagnostic:", error);

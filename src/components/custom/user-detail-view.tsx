@@ -1,62 +1,79 @@
 "use client";
 
-import { useState } from "react";
-import {
-  User as UserIcon,
-  Calendar,
-  Target,
-  MessageSquare,
-  Clock,
-} from "lucide-react";
-import { format, formatDate } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import ProcessIndicator from "./process-indicator";
 import { User } from "@supabase/supabase-js";
+import {
+  Calendar,
+  Clock,
+  MessageSquare,
+  Target,
+  User as UserIcon,
+} from "lucide-react";
+import { useState } from "react";
+import ProcessIndicator from "./process-indicator";
+
+// Skeleton component for loading states
+const Skeleton = ({ className = "", ...props }) => {
+  return <div className={`bg-gray-200 rounded-md ${className}`} {...props} />;
+};
 
 interface UserDetailProps {
-  userData: User;
-  diagnostic: any;
-  userProfile: any;
+  userData: { user: User };
+  diagnostic?: any;
+  userProfile?: any;
 }
 
 export default function UserDetailView({
   userData,
   diagnostic,
   userProfile,
-}: any) {
+}: UserDetailProps) {
   const { user } = userData;
   const [expanded, setExpanded] = useState(false);
 
-  console.log(user);
+  // Get display name (name or email)
+  const displayName =
+    user.user_metadata?.first_name && user.user_metadata?.last_name
+      ? `${user.user_metadata.first_name} ${user.user_metadata.last_name}`
+      : user.email?.split("@")[0] || "User";
 
-  // Format the exam date if it exists
-  const formattedExamDate = user.examDate
-    ? format(new Date(user.examDate), "MMMM d, yyyy")
-    : "Not specified";
+  // Format date helper function
+  const formatDate = (
+    dateString: string | undefined,
+    format: string = "dd.MM.yyyy"
+  ) => {
+    if (!dateString) return null;
+    try {
+      return new Intl.DateTimeFormat("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date(dateString));
+    } catch (e) {
+      return null;
+    }
+  };
 
   // Calculate days until exam if exam date exists
-  const daysUntilExam = userProfile?.sat_metadata.exam_date
+  const daysUntilExam = userProfile?.sat_metadata?.exam_date
     ? Math.ceil(
-        (new Date(userProfile?.sat_metadata.exam_date).getTime() -
+        (new Date(userProfile.sat_metadata.exam_date).getTime() -
           new Date().getTime()) /
           (1000 * 60 * 60 * 24)
       )
     : null;
 
-  // Get display name (name or email)
-  const displayName =
-    user.user_metadata?.first_name + " " + user.user_metadata?.last_name ||
-    user.email?.split("@")[0];
-
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden max-w-6xl ml-8">
       {/* User Card Header */}
-
       <div className="p-6 pb-4">
         <div className="flex items-start gap-4">
           <Avatar className="h-16 w-16 border-2 border-white shadow-sm">
-            <AvatarImage src={user.profileImage} alt={displayName} />
+            <AvatarImage
+              src={user.user_metadata?.avatar_url}
+              alt={displayName}
+            />
             <AvatarFallback className="bg-gray-200 text-gray-600">
               <UserIcon className="h-8 w-8" />
             </AvatarFallback>
@@ -66,13 +83,18 @@ export default function UserDetailView({
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div>
                 <h2 className="text-xl font-bold">{displayName}</h2>
-                <p className="text-gray-500 text-sm">{user.email}</p>
+                <p className="text-gray-500 text-sm">
+                  {user.email || <Skeleton className="h-4 w-32" />}
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <Badge className="flex items-center gap-1 px-2 py-1 bg-[#DB5461] text-white">
                   <Clock className="h-3 w-3" />
                   <span>
-                    Joined {formatDate(user.created_at, "dd.MM.yyyy")}
+                    Joined{" "}
+                    {formatDate(user.created_at) || (
+                      <Skeleton className="h-3 w-16 inline-block" />
+                    )}
                   </span>
                 </Badge>
               </div>
@@ -85,12 +107,13 @@ export default function UserDetailView({
                 </div>
                 <div>
                   <div className="text-sm font-medium">Estimated Exam Date</div>
-                  <div className="text-sm text-gray-500">
-                    {formatDate(
-                      userProfile?.sat_metadata.exam_date,
-                      "dd.MM.yyyy"
-                    )}
-                  </div>
+                  {userProfile?.sat_metadata?.exam_date ? (
+                    <div className="text-sm text-gray-500">
+                      {formatDate(userProfile.sat_metadata.exam_date)}
+                    </div>
+                  ) : (
+                    <Skeleton className="h-4 w-24 mt-1" />
+                  )}
                   {daysUntilExam !== null && daysUntilExam > 0 && (
                     <div className="text-xs text-blue-600 font-medium">
                       {daysUntilExam} days remaining
@@ -105,14 +128,16 @@ export default function UserDetailView({
                 </div>
                 <div>
                   <div className="text-sm font-medium">Target Score</div>
-                  <div className="text-sm text-gray-500">
-                    {userProfile?.sat_metadata.desired_score || "Not specified"}
-                    {userProfile?.sat_metadata.desired_score && (
+                  {userProfile?.sat_metadata?.desired_score ? (
+                    <div className="text-sm text-gray-500">
+                      {userProfile.sat_metadata.desired_score}
                       <span className="text-xs text-green-600 font-medium ml-1">
                         / 1600
                       </span>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <Skeleton className="h-4 w-20 mt-1" />
+                  )}
                 </div>
               </div>
             </div>
@@ -120,7 +145,7 @@ export default function UserDetailView({
         </div>
 
         {/* Motivation Speech Bubble */}
-        {userProfile?.sat_metadata?.motivation && (
+        {userProfile?.sat_metadata?.motivation ? (
           <div className="mt-6 relative">
             <div
               className="bg-gray-100 p-4 rounded-lg rounded-tl-none text-gray-700 text-sm"
@@ -135,14 +160,15 @@ export default function UserDetailView({
               <div className="pl-4">{userProfile.sat_metadata.motivation}</div>
             </div>
           </div>
+        ) : (
+          <div className="mt-6">
+            <Skeleton className="h-16 w-full rounded-lg" />
+          </div>
         )}
       </div>
 
       {/* Process Indicator */}
       <div className="border-t border-gray-200 p-6 pt-4 bg-gray-50">
-        <h3 className="text-sm font-medium text-gray-700 mb-4">
-          Diagnostic Progress
-        </h3>
         <ProcessIndicator
           completedSteps={{
             profile: Boolean(userProfile),
@@ -150,7 +176,7 @@ export default function UserDetailView({
             math: Boolean(diagnostic?.math_diagnostic_id),
             results: Boolean(userProfile) && Boolean(diagnostic),
           }}
-          activeStep={"profile"}
+          activeStep={null}
         />
       </div>
     </div>
