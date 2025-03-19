@@ -50,7 +50,7 @@ export default function UserDetailView({
     user.email?.split("@")[0];
 
   return (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden max-w-6xl mx-auto">
+    <div className="bg-white rounded-xl shadow-md overflow-hidden max-w-6xl ml-8">
       {/* User Card Header */}
 
       <div className="p-6 pb-4">

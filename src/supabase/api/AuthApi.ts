@@ -12,4 +12,12 @@ export const AuthApi = {
     const { data, error } = await supabase.auth.admin.getUserById(id);
     return { data, error };
   },
+  signInWithEmail: async (email: string, password: string) => {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    return { data, error };
+  },
 };

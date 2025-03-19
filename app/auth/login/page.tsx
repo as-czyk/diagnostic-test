@@ -9,6 +9,8 @@ import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { SupabaseApi } from "@/supabase/SupabaseApi";
+import { Routes } from "@/routes/Routes";
 
 export default function TutorLogin() {
   const router = useRouter();
@@ -39,11 +41,17 @@ export default function TutorLogin() {
 
     // Simulate API call
     try {
-      // In a real app, this would be an actual API call to authenticate
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const { data, error } = await SupabaseApi.signInWithEmail(
+        email,
+        password
+      );
 
-      // Redirect to tutor dashboard on success
-      router.push("/tutor/dashboard");
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
+      router.push(Routes.Dashboard);
     } catch (err) {
       setError("Invalid email or password. Please try again.");
     } finally {

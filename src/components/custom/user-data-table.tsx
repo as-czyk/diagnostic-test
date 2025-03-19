@@ -92,7 +92,7 @@ export default function DataTable({ data = [] }: DataTableProps) {
   };
 
   return (
-    <div className="space-y-4 max-w-5xl mx-auto">
+    <div className="space-y-4 max-w-5xl ml-8">
       {/* Search and page size controls */}
       <div className="flex flex-col sm:flex-row justify-between gap-4">
         <div className="relative w-full sm:w-64">
