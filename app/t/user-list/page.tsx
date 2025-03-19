@@ -16,8 +16,7 @@ export default async function UserList() {
       return {
         id: diagnostic.id,
         userId: diagnostic.user_id,
-        username: data?.user?.user_metadata?.username ?? "",
-        email: data?.user?.email ?? "",
+        email: data?.user?.email ?? "Email not found",
         createdAt: diagnostic.created_at
           ? new Date(diagnostic.created_at)
           : new Date(),

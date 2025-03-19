@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -9,32 +10,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
 import {
+  ArrowUpDown,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
   Eye,
-  ArrowUpDown,
   Search,
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { format } from "date-fns";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 // Define the data type for our table entries
 interface DataEntry {
   id: string;
   userId: string;
-  username: string;
   email: string;
   createdAt: Date;
 }
@@ -55,7 +47,6 @@ export default function DataTable({ data = [] }: DataTableProps) {
   // Filter data based on search term
   const filteredData = data.filter(
     (entry) =>
-      entry.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entry.userId.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -120,42 +111,45 @@ export default function DataTable({ data = [] }: DataTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[250px]">
+              <TableHead className="w-[33%] text-black font-medium">
                 <Button
                   variant="ghost"
-                  className="p-0 font-medium flex items-center"
-                  onClick={() => handleSort("username")}
+                  className="p-0 font-medium text-black flex items-center"
+                  onClick={() => handleSort("email")}
                 >
                   User
                   <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
               </TableHead>
-              <TableHead>
+              <TableHead className="w-[33%] text-black font-medium">
                 <Button
                   variant="ghost"
-                  className="p-0 font-medium flex items-center"
+                  className="p-0 font-medium text-black flex items-center"
                   onClick={() => handleSort("createdAt")}
                 >
                   Created At
                   <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
               </TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="w-[34%] text-center text-black font-medium">
+                <span>Actions</span>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedData.length > 0 ? (
               paginatedData.map((entry) => (
                 <TableRow key={entry.id}>
-                  <TableCell>
-                    <div className="font-medium">{entry.username}</div>
-                    <div className="text-sm text-gray-500">{entry.email}</div>
-                    <div className="text-xs text-gray-400">
+                  <TableCell className="w-[33%]">
+                    <div className="text-sm text-gray-700">{entry.email}</div>
+                    <div className="text-xs text-gray-600">
                       ID: {entry.userId}
                     </div>
                   </TableCell>
-                  <TableCell>{formatDate(entry.createdAt)}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="w-[33%]">
+                    {formatDate(entry.createdAt)}
+                  </TableCell>
+                  <TableCell className="w-[34%] text-center">
                     <Button
                       variant="ghost"
                       size="sm"
