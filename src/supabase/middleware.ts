@@ -40,8 +40,6 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  console.log("user", user);
-
   if (!user && request.nextUrl.pathname.startsWith("/f")) {
     const url = request.nextUrl.clone();
     url.pathname = Routes.Home;

@@ -22,8 +22,6 @@ export async function middleware(request: NextRequest) {
 
   const { data, error } = await SupabaseServer.auth.getSession();
 
-  console.log("data", data);
-
   if (!data?.session || error) {
     if (request.nextUrl.pathname.startsWith("/t")) {
       const url = request.nextUrl.clone();
