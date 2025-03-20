@@ -7,7 +7,6 @@ export enum Routes {
   GenerateResult = "/f/generate-result",
 
   /* Tutor Dashboard Routes */
-  Dashboard = "/t/dashboard",
   UserList = "/t/user-list",
 
   /*  Auth Routes */

@@ -26,6 +26,7 @@ export async function getExamResultById(id: string): Promise<{
       .single();
 
     if (error) {
+      console.error("Error getting exam result:", error);
       return { data: null, error: new Error(error.message) };
     }
 
@@ -42,7 +43,6 @@ export async function getExamResultById(id: string): Promise<{
 
     return { data: validationResult.data, error: null };
   } catch (error) {
-    console.error("Error getting exam result:", error);
     return {
       data: null,
       error:

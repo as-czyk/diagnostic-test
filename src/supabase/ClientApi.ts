@@ -179,5 +179,45 @@ export const ClientApi = {
     }
   },
 
+  async getExamResultById(
+    id: string
+  ): Promise<{ data: ExamResult | null; error: Error | null }> {
+    try {
+      const supabase = createClient();
+
+      const { data, error } = await supabase
+        .from("exam_results")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error) {
+        return { data: null, error: new Error(error.message) };
+      }
+
+      // Validate the data against the schema
+      const validationResult = ExamResultSchema.safeParse(data);
+      if (!validationResult.success) {
+        return {
+          data: null,
+          error: new Error(
+            `Invalid exam result data: ${validationResult.error.message}`
+          ),
+        };
+      }
+
+      return { data: validationResult.data, error: null };
+    } catch (error) {
+      console.error("Error getting exam result:", error);
+      return {
+        data: null,
+        error:
+          error instanceof Error
+            ? error
+            : new Error("An unexpected error occurred"),
+      };
+    }
+  },
+
   // Add other client-side methods as needed
 };

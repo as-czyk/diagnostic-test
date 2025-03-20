@@ -539,6 +539,7 @@ export default function ExamAnalysis({
                         if (payload.status === "correct") {
                           return (
                             <circle
+                              key={payload.question}
                               cx={cx}
                               cy={cy}
                               r={6}
@@ -551,6 +552,7 @@ export default function ExamAnalysis({
 
                         return (
                           <circle
+                            key={payload.question}
                             cx={cx}
                             cy={cy}
                             r={6}

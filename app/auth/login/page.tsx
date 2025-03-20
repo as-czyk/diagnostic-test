@@ -54,7 +54,7 @@ export default function TutorLogin() {
 
       setUser(parsedRes.data);
 
-      router.push(Routes.Dashboard);
+      router.push(Routes.UserList);
     } catch (err) {
       setError("Invalid email or password. Please try again.");
     } finally {

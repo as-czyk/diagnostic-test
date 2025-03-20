@@ -4,14 +4,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { User } from "@supabase/supabase-js";
 import {
+  BookOpen,
   Calendar,
   Clock,
+  FileText,
   MessageSquare,
   Target,
   User as UserIcon,
 } from "lucide-react";
 import { useState } from "react";
 import ProcessIndicator from "./process-indicator";
+import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
 
 // Skeleton component for loading states
 const Skeleton = ({ className = "", ...props }) => {
@@ -31,7 +35,7 @@ export default function UserDetailView({
 }: UserDetailProps) {
   const { user } = userData;
   const [expanded, setExpanded] = useState(false);
-
+  const router = useRouter();
   // Get display name (name or email)
   const displayName =
     user?.user_metadata?.first_name && user?.user_metadata?.last_name
@@ -178,6 +182,51 @@ export default function UserDetailView({
           }}
           activeStep={null}
         />
+      </div>
+      <div className="bg-gray-50 p-4 border-b border-gray-200">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button
+            className="flex-1 bg-[#DB5461] hover:bg-[#c64854] text-white flex items-center justify-center gap-2"
+            size="lg"
+            disabled={!Boolean(diagnostic?.math_diagnostic_id)}
+          >
+            <FileText className="h-5 w-5" />
+            View Math Diagnostic Results
+            {!Boolean(diagnostic?.math_diagnostic_id) && (
+              <span className="text-xs">(Incomplete)</span>
+            )}
+          </Button>
+
+          <Button
+            className="flex-1 bg-[#DB5461] hover:bg-[#c64854]  flex items-center justify-center gap-2"
+            size="lg"
+            variant="outline"
+            disabled={!Boolean(diagnostic?.verbal_diagnostic_id)}
+            onClick={() => {
+              window.open(
+                `/shared/result/${diagnostic?.verbal_diagnostic_id}`,
+                "_blank"
+              );
+            }}
+          >
+            <FileText className="h-5 w-5" />
+            View Verbal Diagnostic Results
+            {!Boolean(diagnostic?.verbal_diagnostic_id) && (
+              <span className="text-xs">(Incomplete)</span>
+            )}
+          </Button>
+          <Button
+            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-2"
+            size="lg"
+          >
+            <BookOpen className="h-5 w-5" />
+            View Study Plan
+            {!!Boolean(diagnostic?.verbal_diagnostic_id) &&
+              !Boolean(diagnostic?.math_diagnostic_id) && (
+                <span className="text-xs">(Incomplete)</span>
+              )}
+          </Button>
+        </div>
       </div>
     </div>
   );

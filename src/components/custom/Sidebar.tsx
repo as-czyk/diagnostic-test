@@ -6,11 +6,6 @@ import Link from "next/link";
 
 const navLinks: any = [
   {
-    icon: <HomeIcon color="black" className="h-5 w-5" />,
-    text: "Dashboard",
-    ref: Routes.Dashboard,
-  },
-  {
     icon: <UserIcon color="black" className="h-5 w-5" />,
     text: "User List",
     ref: Routes.UserList,
