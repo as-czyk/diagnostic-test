@@ -22,10 +22,14 @@ export async function middleware(request: NextRequest) {
 
   const { data, error } = await SupabaseServer.auth.getSession();
 
+  console.log("data", data);
+
   if (!data?.session || error) {
-    const url = request.nextUrl.clone();
-    url.pathname = Routes.Login;
-    return NextResponse.redirect(url);
+    if (request.nextUrl.pathname.startsWith("/t")) {
+      const url = request.nextUrl.clone();
+      url.pathname = Routes.Login;
+      return NextResponse.redirect(url);
+    }
   }
 
   if (data?.session) {
@@ -34,7 +38,10 @@ export async function middleware(request: NextRequest) {
       const decodedToken = decodeJWT(data.session?.access_token);
       const userRole = decodedToken.user_role;
 
-      if (userRole !== Roles.TUTOR) {
+      if (
+        userRole !== Roles.TUTOR &&
+        request.nextUrl.pathname.startsWith("/t")
+      ) {
         const url = request.nextUrl.clone();
         url.pathname = Routes.Login;
         return NextResponse.redirect(url);
@@ -50,5 +57,5 @@ export async function middleware(request: NextRequest) {
   return await updateSession(request);
 }
 export const config = {
-  matcher: "/t/:path*",
+  matcher: ["/t/:path*", "/f/:path*"],
 };
