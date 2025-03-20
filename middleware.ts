@@ -1,7 +1,52 @@
+import { Routes } from "@/routes/Routes";
 import { updateSession } from "@/supabase/middleware";
-import { type NextRequest } from "next/server";
+import { createSupabaseServerClient } from "@/supabase/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { Roles } from "@/constants/Roles";
+
+// Replace jsonwebtoken with a function that works in Edge runtime
+function decodeJWT(token: string) {
+  // Split the token into header, payload, and signature
+  const [_header, payload, _signature] = token.split(".");
+
+  // Decode the payload
+  const decodedPayload = JSON.parse(
+    Buffer.from(payload, "base64").toString("utf-8")
+  );
+
+  return decodedPayload;
+}
 
 export async function middleware(request: NextRequest) {
+  const SupabaseServer = await createSupabaseServerClient();
+
+  const { data, error } = await SupabaseServer.auth.getSession();
+
+  if (!data?.session || error) {
+    const url = request.nextUrl.clone();
+    url.pathname = Routes.Login;
+    return NextResponse.redirect(url);
+  }
+
+  if (data?.session) {
+    try {
+      // Use the decode function instead of jwt.verify
+      const decodedToken = decodeJWT(data.session?.access_token);
+      const userRole = decodedToken.user_role;
+
+      if (userRole !== Roles.TUTOR) {
+        const url = request.nextUrl.clone();
+        url.pathname = Routes.Login;
+        return NextResponse.redirect(url);
+      }
+    } catch (e) {
+      console.error("Failed to decode JWT token:", e);
+      const url = request.nextUrl.clone();
+      url.pathname = Routes.Login;
+      return NextResponse.redirect(url);
+    }
+  }
+
   return await updateSession(request);
 }
 
@@ -14,6 +59,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * Feel free to modify this pattern to include more paths.
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/t/:path*",
   ],
 };
