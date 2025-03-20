@@ -13,8 +13,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SAT Diagnostic Test",
+  title: "SAT Diagnostic Test - Helping students succeed with SAT preparation",
   description: "Helping students succeed with SAT preparation",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
