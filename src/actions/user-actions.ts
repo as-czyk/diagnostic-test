@@ -5,6 +5,7 @@ import { createSupabaseAdminClient } from "@/supabase/admin";
 import { createSupabaseServerClient } from "@/supabase/server";
 import { SupabaseApi } from "@/supabase/SupabaseApi";
 import jwt from "jsonwebtoken";
+import { decodeJWT } from "../../middleware";
 
 // Define the input type for the updateUserProfile action
 type UpdateUserProfileInput = {
@@ -114,4 +115,23 @@ export async function signOutAction() {
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.signOut();
   return { error };
+}
+
+export async function getUserAction() {
+  try {
+    const SupabaseServer = await createSupabaseServerClient();
+    const { data, error } = await SupabaseServer.auth.getUser();
+    const { data: session, error: sessionError } =
+      await SupabaseServer.auth.getSession();
+
+    const decodedToken = decodeJWT(session?.session?.access_token ?? "");
+
+    return {
+      ...data.user,
+      userRole: decodedToken.user_role,
+    };
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
 }

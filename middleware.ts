@@ -5,7 +5,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { Roles } from "@/constants/Roles";
 
 // Replace jsonwebtoken with a function that works in Edge runtime
-function decodeJWT(token: string) {
+export function decodeJWT(token: string) {
   // Split the token into header, payload, and signature
   const [_header, payload, _signature] = token.split(".");
 

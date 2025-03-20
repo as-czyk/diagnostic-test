@@ -24,12 +24,14 @@ export const useUserStore = create<UserStore>((set) => ({
   setUser: (user) => {
     if (!user) return;
 
+    const displayName = `${user?.user_metadata?.first_name} ${user?.user_metadata?.last_name}`;
+
     set(() => ({
       userId: user.id,
       email: user.email,
       profileUrl: user?.user_metadata?.avatar_url ?? "",
-      displayName: user?.user_metadata?.fullName ?? "",
-      userRole: user.userRole,
+      displayName: displayName ?? "",
+      userRole: user?.userRole,
     }));
   },
   setUserId: (id: string) =>

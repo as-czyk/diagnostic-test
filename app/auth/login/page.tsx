@@ -11,6 +11,7 @@ import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useUserStore } from "@/stores/useUserStore";
 
 export default function TutorLogin() {
   const router = useRouter();
@@ -19,6 +20,8 @@ export default function TutorLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { setUser } = useUserStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +51,8 @@ export default function TutorLogin() {
         setError(parsedRes.data.msg);
         return;
       }
+
+      setUser(parsedRes.data);
 
       router.push(Routes.Dashboard);
     } catch (err) {
