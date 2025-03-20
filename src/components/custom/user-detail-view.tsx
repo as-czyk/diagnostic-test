@@ -68,6 +68,32 @@ export default function UserDetailView({
       )
     : null;
 
+  const getActiveStep = () => {
+    if (!userProfile) {
+      return "profile";
+    }
+
+    if (!diagnostic?.verbal_diagnostic_id && diagnostic?.math_diagnostic_id) {
+      return "verbal";
+    }
+
+    if (!diagnostic?.math_diagnostic_id && diagnostic?.verbal_diagnostic_id) {
+      return "math";
+    }
+
+    if (!diagnostic?.verbal_diagnostic_id && !diagnostic?.math_diagnostic_id) {
+      return "verbal";
+    }
+
+    if (diagnostic?.verbal_diagnostic_id && diagnostic?.math_diagnostic_id) {
+      return "results";
+    }
+
+    return null;
+  };
+
+  console.log("getActiveStep", getActiveStep());
+
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden max-w-6xl ml-8">
       {/* User Card Header */}
@@ -178,9 +204,12 @@ export default function UserDetailView({
             profile: Boolean(userProfile),
             verbal: Boolean(diagnostic?.verbal_diagnostic_id),
             math: Boolean(diagnostic?.math_diagnostic_id),
-            results: Boolean(userProfile) && Boolean(diagnostic),
+            results:
+              Boolean(userProfile) &&
+              Boolean(diagnostic.verbal_diagnostic_id) &&
+              Boolean(diagnostic?.math_diagnostic_id),
           }}
-          activeStep={null}
+          activeStep={getActiveStep()}
         />
       </div>
       <div className="bg-gray-50 p-4 border-b border-gray-200">
