@@ -19,7 +19,7 @@ const Skeleton = ({ className = "", ...props }) => {
 };
 
 interface UserDetailProps {
-  userData: { user: User };
+  userData: { user: User | null };
   diagnostic?: any;
   userProfile?: any;
 }
@@ -34,9 +34,9 @@ export default function UserDetailView({
 
   // Get display name (name or email)
   const displayName =
-    user.user_metadata?.first_name && user.user_metadata?.last_name
-      ? `${user.user_metadata.first_name} ${user.user_metadata.last_name}`
-      : user.email?.split("@")[0] || "User";
+    user?.user_metadata?.first_name && user?.user_metadata?.last_name
+      ? `${user?.user_metadata.first_name} ${user?.user_metadata.last_name}`
+      : user?.email?.split("@")[0] || "User";
 
   // Format date helper function
   const formatDate = (
@@ -71,7 +71,7 @@ export default function UserDetailView({
         <div className="flex items-start gap-4">
           <Avatar className="h-16 w-16 border-2 border-white shadow-sm">
             <AvatarImage
-              src={user.user_metadata?.avatar_url}
+              src={user?.user_metadata?.avatar_url}
               alt={displayName}
             />
             <AvatarFallback className="bg-gray-200 text-gray-600">
@@ -84,7 +84,7 @@ export default function UserDetailView({
               <div>
                 <h2 className="text-xl font-bold">{displayName}</h2>
                 <p className="text-gray-500 text-sm">
-                  {user.email || <Skeleton className="h-4 w-32" />}
+                  {user?.email || <Skeleton className="h-4 w-32" />}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -92,7 +92,7 @@ export default function UserDetailView({
                   <Clock className="h-3 w-3" />
                   <span>
                     Joined{" "}
-                    {formatDate(user.created_at) || (
+                    {formatDate(user?.created_at) || (
                       <Skeleton className="h-3 w-16 inline-block" />
                     )}
                   </span>

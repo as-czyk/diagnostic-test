@@ -5,6 +5,7 @@ type UserStoreState = {
   email: string;
   profileUrl?: string;
   displayName?: string;
+  userRole?: string;
 };
 
 type UserStoreActions = {
@@ -19,6 +20,7 @@ type UserStore = UserStoreState & UserStoreActions;
 export const useUserStore = create<UserStore>((set) => ({
   userId: "",
   email: "",
+  userRole: "",
   setUser: (user) => {
     if (!user) return;
 
@@ -27,6 +29,7 @@ export const useUserStore = create<UserStore>((set) => ({
       email: user.email,
       profileUrl: user?.user_metadata?.avatar_url ?? "",
       displayName: user?.user_metadata?.fullName ?? "",
+      userRole: user.userRole,
     }));
   },
   setUserId: (id: string) =>

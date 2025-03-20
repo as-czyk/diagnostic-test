@@ -6,7 +6,7 @@ export default async function UserDetailsPage({
 }: {
   params: { id: string };
 }) {
-  const { id } = params;
+  const { id } = await params;
   const { data: diagnosticData, error: diagnosticError } =
     await SupabaseApi.getDiagnosticById(id);
   const { data, error } = await SupabaseApi.getUserById(

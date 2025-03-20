@@ -3,6 +3,7 @@
 import { createSupabaseAdminClient } from "@/supabase/admin";
 import { createSupabaseServerClient } from "@/supabase/server";
 import { SupabaseApi } from "@/supabase/SupabaseApi";
+import jwt from "jsonwebtoken";
 
 // Define the input type for the updateUserProfile action
 type UpdateUserProfileInput = {
@@ -71,7 +72,6 @@ export async function loginAction(
   email: string,
   password: string
 ): Promise<any> {
-  console.log("loginAction", email, password);
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
@@ -88,11 +88,16 @@ export async function loginAction(
       },
     });
   }
+  const secret = process.env.SUPABASE_JWT_SECRET as string;
+  const decodedToken: any = jwt.verify(data.session?.access_token, secret);
+  const userRole = decodedToken.user_role;
 
   return JSON.stringify({
     success: true,
-    data: data.user,
-    token: data.session?.access_token,
+    data: {
+      ...data.user,
+      userRole,
+    },
   });
 }
 
