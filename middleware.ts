@@ -49,6 +49,6 @@ export async function middleware(request: NextRequest) {
 
   return await updateSession(request);
 }
-
-// Use the new Next.js middleware matcher configuration
-export const matcher = ["/t/:path*"];
+export const config = {
+  matcher: "/t/:path*",
+};
