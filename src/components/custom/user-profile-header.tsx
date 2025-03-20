@@ -1,16 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import {
-  User,
-  Settings,
-  HelpCircle,
-  LogOut,
-  Bell,
-  ChevronDown,
-  MessageSquare,
-} from "lucide-react";
+import { signOutAction } from "@/actions/user-actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,22 +12,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { ChevronDown, HelpCircle, LogOut, Settings, User } from "lucide-react";
 
 interface UserProfileHeaderProps {
   userName?: string;
   userRole?: string;
   userImage?: string;
-  onSignOut?: () => void;
 }
 
 export default function UserProfileHeader({
   userName = "Sarah Johnson",
   userRole = "Tutor",
   userImage = "/placeholder.svg?height=40&width=40",
-  onSignOut = () => console.log("Sign out clicked"),
 }: UserProfileHeaderProps) {
+  const onSignOut = async () => {
+    await signOutAction();
+  };
+
   return (
     <div className="flex items-center rounded-full bg-gray-50 shadow-md p-1.5 border border-gray-100">
       {/* User Profile */}

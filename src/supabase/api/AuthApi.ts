@@ -20,4 +20,9 @@ export const AuthApi = {
     });
     return { data, error };
   },
+  signOut: async () => {
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase.auth.signOut();
+    return { error };
+  },
 };

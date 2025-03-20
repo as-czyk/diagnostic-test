@@ -95,3 +95,9 @@ export async function loginAction(
     token: data.session?.access_token,
   });
 }
+
+export async function signOutAction() {
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.signOut();
+  return { error };
+}
