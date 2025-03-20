@@ -42,9 +42,10 @@ export default function TutorLogin() {
     // Simulate API call
     try {
       const res = await loginAction(email, password);
+      const parsedRes = JSON.parse(res);
 
-      if (res.success) {
-        setError(res.data.msg);
+      if (!parsedRes.success) {
+        setError(parsedRes.data.msg);
         return;
       }
 

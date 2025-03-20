@@ -1,5 +1,6 @@
 "use server";
 
+import { Roles } from "@/constants/Roles";
 import { createSupabaseAdminClient } from "@/supabase/admin";
 import { createSupabaseServerClient } from "@/supabase/server";
 import { SupabaseApi } from "@/supabase/SupabaseApi";
@@ -88,9 +89,17 @@ export async function loginAction(
       },
     });
   }
+
   const secret = process.env.SUPABASE_JWT_SECRET as string;
   const decodedToken: any = jwt.verify(data.session?.access_token, secret);
   const userRole = decodedToken.user_role;
+
+  if (userRole !== Roles.TUTOR) {
+    return JSON.stringify({
+      success: false,
+      data: { msg: "Unauthorized" },
+    });
+  }
 
   return JSON.stringify({
     success: true,
