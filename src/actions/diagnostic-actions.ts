@@ -5,9 +5,11 @@ import { Routes } from "@/routes/Routes";
 import { UpdateDiagnostic } from "@/supabase/db/diagnostic";
 import { SupabaseApi } from "@/supabase/SupabaseApi";
 
-export async function SignInAndCreateDiagnosticAction() {
+export async function SignInAndCreateDiagnosticAction(captchaToken: string) {
   try {
-    const { data: userData, error } = await SupabaseApi.signInAnonymously();
+    const { data: userData, error } = await SupabaseApi.signInAnonymously(
+      captchaToken
+    );
 
     if (error) {
       console.error("Sign in error:", error);

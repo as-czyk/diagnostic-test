@@ -41,12 +41,13 @@ export default async function ExamPage(props: {
   const { data: userData } = await supabase.auth.admin.getUserById(
     examResult.user_id
   );
+  console.log(userData);
 
   // Get student name from user data or use default
   const studentName =
-    userData?.user?.user_metadata?.full_name ||
-    userData?.user?.user_metadata?.name ||
-    "Student";
+    userData?.user?.user_metadata?.first_name +
+      " " +
+      userData?.user?.user_metadata?.last_name || "Student";
 
   // Prepare data for the ExamAnalysis component
   const analysisData = await prepareExamDataServer(

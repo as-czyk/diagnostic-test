@@ -72,12 +72,14 @@ export async function updateUserProfile(data: UpdateUserProfileInput) {
 
 export async function loginAction(
   email: string,
-  password: string
+  password: string,
+  captchaToken?: string
 ): Promise<any> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
+    options: { captchaToken },
   });
 
   if (error) {

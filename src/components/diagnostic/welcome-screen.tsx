@@ -1,16 +1,15 @@
 "use client";
 
+import { SignInAndCreateDiagnosticAction } from "@/actions/diagnostic-actions";
 import { Button } from "@/components/ui/button";
-import { Routes } from "@/routes/Routes";
-import { SupabaseApi } from "@/supabase/SupabaseApi";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import BackgroundAnimation from "./background-animation";
-import { SignInAndCreateDiagnosticAction } from "@/actions/diagnostic-actions";
-
+import { useApplicationStore } from "@/stores/useApplicationStore";
 export default function WelcomeScreen() {
+  const { captchaToken } = useApplicationStore();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -23,7 +22,7 @@ export default function WelcomeScreen() {
   const handleClick = async () => {
     startTransition(async () => {
       try {
-        const result = await SignInAndCreateDiagnosticAction();
+        const result = await SignInAndCreateDiagnosticAction(captchaToken);
         if (result?.success && result.redirectTo) {
           router.push(result.redirectTo);
         } else if (result?.error) {

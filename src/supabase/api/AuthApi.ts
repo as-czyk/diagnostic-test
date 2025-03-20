@@ -2,9 +2,11 @@ import { createSupabaseAdminClient } from "../admin";
 import { createSupabaseServerClient } from "../server";
 
 export const AuthApi = {
-  signInAnonymously: async () => {
+  signInAnonymously: async (captchaToken?: string) => {
     const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase.auth.signInAnonymously();
+    const { data, error } = await supabase.auth.signInAnonymously({
+      options: { captchaToken: captchaToken },
+    });
     return { data, error };
   },
   getUserById: async (id: string) => {

@@ -12,6 +12,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useUserStore } from "@/stores/useUserStore";
+import { Turnstile } from "@marsidev/react-turnstile";
+import { useApplicationStore } from "@/stores/useApplicationStore";
 
 export default function TutorLogin() {
   const router = useRouter();
@@ -20,6 +22,8 @@ export default function TutorLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { setCaptchaToken, captchaToken } = useApplicationStore();
 
   const { setUser } = useUserStore();
 
@@ -44,7 +48,7 @@ export default function TutorLogin() {
 
     // Simulate API call
     try {
-      const res = await loginAction(email, password);
+      const res = await loginAction(email, password, captchaToken);
       const parsedRes = JSON.parse(res);
 
       if (!parsedRes.success) {
@@ -148,6 +152,22 @@ export default function TutorLogin() {
                 {isLoading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
+            <div className="mt-4">
+              <Turnstile
+                siteKey={process.env.NEXT_PUBLIC_SITE_KEY!}
+                onSuccess={(token: string) => {
+                  setCaptchaToken(token);
+                }}
+                onError={() => router.push("/error")}
+                options={{
+                  theme: "light",
+                  size: "normal",
+                }}
+                scriptOptions={{
+                  appendTo: "body",
+                }}
+              />
+            </div>
 
             <div className="mt-6 pt-6 border-t border-gray-200 text-center">
               <div className="inline-flex items-center justify-center px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
