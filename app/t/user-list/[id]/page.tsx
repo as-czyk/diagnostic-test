@@ -1,11 +1,9 @@
 import UserDetailView from "@/components/custom/user-detail-view";
 import { SupabaseApi } from "@/supabase/SupabaseApi";
 
-export default async function UserDetailsPage(
-  props: {
-    params: Promise<{ id: string }>;
-  }
-) {
+export default async function UserDetailsPage(props: {
+  params: Promise<{ id: string }>;
+}) {
   const params = await props.params;
   const { id } = params;
   const { data: diagnosticData, error: diagnosticError } =
