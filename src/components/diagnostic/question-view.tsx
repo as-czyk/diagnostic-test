@@ -2,20 +2,22 @@
 
 import { updateDiagnostic } from "@/actions/diagnostic-actions";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup } from "@/components/ui/radio-group";
 import { ExamId } from "@/constants/Constants";
 import { Routes } from "@/routes/Routes";
 import { useResultStore } from "@/stores";
 import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore";
 import { useTimerStore } from "@/stores/useTimerStore";
 import { ClientApi } from "@/supabase/ClientApi";
+import { MathJaxContext } from "better-react-mathjax";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card } from "../ui/card";
 import { Separator } from "../ui/separator";
-import { MathJaxContext } from "better-react-mathjax";
+import { ChoicesRenderer } from "./question-view/ChoicesRenderer";
+import { SubmitRenderer } from "./question-view/SubmitRenderer";
+import { QuestionTextRenderer } from "./question-view/QuestionTextRenderer";
 
 export default function QuestionView() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -33,14 +35,14 @@ export default function QuestionView() {
 
   const { addResult, getResults } = useResultStore();
 
-  const { resetTimerStore } = useTimerStore();
+  const { resetTimerStore } = useTimerStore.getState();
   const router = useRouter();
 
   const isLastQuestion =
     getCurrentQuestionIndex() === exam?.questions.length - 1;
 
   // Start timer when component mounts
-  useEffect(() => {
+  /*useEffect(() => {
     // Start timer
     timerRef.current = setInterval(() => {
       setQuestionTimer((prev) => prev + 1);
@@ -57,7 +59,7 @@ export default function QuestionView() {
   // Reset timer when question changes
   useEffect(() => {
     setQuestionTimer(0);
-  }, [currentQuestion?.id]);
+  }, [currentQuestion?.id]);*/
 
   // Handle answer selection
   const handleOptionSelect = (optionId: string) => setSelectedOption(optionId);
@@ -153,24 +155,7 @@ export default function QuestionView() {
           <main className="flex-grow container max-w-6xl mx-auto px-4 py-8">
             <div className="flex flex-col lg:flex-row gap-6 h-full">
               {/* Question Panel - Left Side */}
-              <Card className="flex-1 lg:w-1/2 overflow-hidden">
-                <div className="p-6 flex flex-col h-full">
-                  <div className="mb-3 flex items-center justify-between">
-                    <h2 className="text-lg font-medium text-gray-900">
-                      Question {getCurrentQuestionIndex() + 1}
-                    </h2>
-                  </div>
-
-                  <Separator className="mb-4" />
-
-                  {/* Scrollable Question Container */}
-                  <div className="overflow-y-auto flex-grow pr-2 mb-4 max-h-[calc(100vh-300px)]">
-                    <p className="text-gray-800 text-lg leading-relaxed">
-                      {question?.text}
-                    </p>
-                  </div>
-                </div>
-              </Card>
+              <QuestionTextRenderer question={question} />
 
               {/* Answer Panel - Right Side */}
               <Card className="flex-1 lg:w-1/2">
@@ -185,57 +170,19 @@ export default function QuestionView() {
                     className="flex-grow"
                   >
                     <div className="space-y-3">
-                      {currentQuestion.choices.map((option: any) => (
-                        <div
-                          key={option.value}
-                          className={`border rounded-lg p-4 transition-colors ${
-                            selectedOption === option.value
-                              ? "border-gray-300 bg-gray-50"
-                              : "border-gray-200 hover:border-gray-300"
-                          }`}
-                        >
-                          <div className="flex items-start">
-                            <RadioGroupItem
-                              value={option.value}
-                              id={`option-${option.value}`}
-                              className="mt-1"
-                            />
-                            <Label
-                              htmlFor={`option-${option.value}`}
-                              className="ml-3 cursor-pointer flex-grow"
-                            >
-                              <div className="text-gray-600 mt-1">
-                                {option.display_text}
-                              </div>
-                            </Label>
-                          </div>
-                        </div>
-                      ))}
+                      <ChoicesRenderer
+                        choices={currentQuestion.choices}
+                        selectedOption={selectedOption}
+                      />
                     </div>
                   </RadioGroup>
 
                   <div className="mt-6 pt-4 border-t border-gray-100">
-                    <Button
-                      onClick={handleNextQuestion}
-                      disabled={!selectedOption}
-                      className="w-full bg-[#DB5461] hover:bg-[#c64854] text-white flex items-center justify-center gap-2 py-6"
-                      size="lg"
-                    >
-                      {!isLastQuestion ? (
-                        <>
-                          Submit & Continue
-                          <ArrowRight className="w-4 h-4" />
-                        </>
-                      ) : (
-                        "Submit & Finish Section"
-                      )}
-                    </Button>
-
-                    <p className="text-xs text-center text-gray-500 mt-2">
-                      {!selectedOption
-                        ? "Please select an answer to continue"
-                        : "Your answer will be saved automatically"}
-                    </p>
+                    <SubmitRenderer
+                      handleNextQuestion={handleNextQuestion}
+                      selectedOption={selectedOption}
+                      isLastQuestion={isLastQuestion}
+                    />
                   </div>
                 </div>
               </Card>
