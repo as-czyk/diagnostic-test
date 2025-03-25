@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { Card } from "../ui/card";
 import { Separator } from "../ui/separator";
+import { MathJaxContext } from "better-react-mathjax";
 
 export default function QuestionView() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -132,103 +133,116 @@ export default function QuestionView() {
 
   const { question } = currentQuestion;
 
+  const mathConfig = {
+    tex: {
+      inlineMath: [["**", "**"]],
+      displayMath: [
+        ["$$", "$$"],
+        ["\\[", "\\]"],
+      ],
+      tags: "none",
+    },
+  };
+
   return (
-    <div className="flex flex-col">
-      {/* Content */}
+    <MathJaxContext config={mathConfig}>
       <div className="flex flex-col">
-        {/* Main question content */}
-        <main className="flex-grow container max-w-6xl mx-auto px-4 py-8">
-          <div className="flex flex-col lg:flex-row gap-6 h-full">
-            {/* Question Panel - Left Side */}
-            <Card className="flex-1 lg:w-1/2 overflow-hidden">
-              <div className="p-6 flex flex-col h-full">
-                <div className="mb-3 flex items-center justify-between">
-                  <h2 className="text-lg font-medium text-gray-900">
-                    Question {getCurrentQuestionIndex() + 1}
-                  </h2>
-                </div>
-
-                <Separator className="mb-4" />
-
-                {/* Scrollable Question Container */}
-                <div className="overflow-y-auto flex-grow pr-2 mb-4 max-h-[calc(100vh-300px)]">
-                  <p className="text-gray-800 text-lg leading-relaxed">
-                    {question?.text}
-                  </p>
-                </div>
-              </div>
-            </Card>
-
-            {/* Answer Panel - Right Side */}
-            <Card className="flex-1 lg:w-1/2">
-              <div className="p-6 flex flex-col h-full">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
-                  Select Your Answer
-                </h3>
-
-                <RadioGroup
-                  value={selectedOption || ""}
-                  onValueChange={handleOptionSelect}
-                  className="flex-grow"
-                >
-                  <div className="space-y-3">
-                    {currentQuestion.choices.map((option: any) => (
-                      <div
-                        key={option.value}
-                        className={`border rounded-lg p-4 transition-colors ${
-                          selectedOption === option.value
-                            ? "border-gray-300 bg-gray-50"
-                            : "border-gray-200 hover:border-gray-300"
-                        }`}
-                      >
-                        <div className="flex items-start">
-                          <RadioGroupItem
-                            value={option.value}
-                            id={`option-${option.value}`}
-                            className="mt-1"
-                          />
-                          <Label
-                            htmlFor={`option-${option.value}`}
-                            className="ml-3 cursor-pointer flex-grow"
-                          >
-                            <div className="text-gray-600 mt-1">
-                              {option.display_text}
-                            </div>
-                          </Label>
-                        </div>
-                      </div>
-                    ))}
+        {/* Content */}
+        <div className="flex flex-col">
+          {/* Main question content */}
+          <main className="flex-grow container max-w-6xl mx-auto px-4 py-8">
+            <div className="flex flex-col lg:flex-row gap-6 h-full">
+              {/* Question Panel - Left Side */}
+              <Card className="flex-1 lg:w-1/2 overflow-hidden">
+                <div className="p-6 flex flex-col h-full">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h2 className="text-lg font-medium text-gray-900">
+                      Question {getCurrentQuestionIndex() + 1}
+                    </h2>
                   </div>
-                </RadioGroup>
 
-                <div className="mt-6 pt-4 border-t border-gray-100">
-                  <Button
-                    onClick={handleNextQuestion}
-                    disabled={!selectedOption}
-                    className="w-full bg-[#DB5461] hover:bg-[#c64854] text-white flex items-center justify-center gap-2 py-6"
-                    size="lg"
-                  >
-                    {!isLastQuestion ? (
-                      <>
-                        Submit & Continue
-                        <ArrowRight className="w-4 h-4" />
-                      </>
-                    ) : (
-                      "Submit & Finish Section"
-                    )}
-                  </Button>
+                  <Separator className="mb-4" />
 
-                  <p className="text-xs text-center text-gray-500 mt-2">
-                    {!selectedOption
-                      ? "Please select an answer to continue"
-                      : "Your answer will be saved automatically"}
-                  </p>
+                  {/* Scrollable Question Container */}
+                  <div className="overflow-y-auto flex-grow pr-2 mb-4 max-h-[calc(100vh-300px)]">
+                    <p className="text-gray-800 text-lg leading-relaxed">
+                      {question?.text}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Card>
-          </div>
-        </main>
+              </Card>
+
+              {/* Answer Panel - Right Side */}
+              <Card className="flex-1 lg:w-1/2">
+                <div className="p-6 flex flex-col h-full">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Select Your Answer
+                  </h3>
+
+                  <RadioGroup
+                    value={selectedOption || ""}
+                    onValueChange={handleOptionSelect}
+                    className="flex-grow"
+                  >
+                    <div className="space-y-3">
+                      {currentQuestion.choices.map((option: any) => (
+                        <div
+                          key={option.value}
+                          className={`border rounded-lg p-4 transition-colors ${
+                            selectedOption === option.value
+                              ? "border-gray-300 bg-gray-50"
+                              : "border-gray-200 hover:border-gray-300"
+                          }`}
+                        >
+                          <div className="flex items-start">
+                            <RadioGroupItem
+                              value={option.value}
+                              id={`option-${option.value}`}
+                              className="mt-1"
+                            />
+                            <Label
+                              htmlFor={`option-${option.value}`}
+                              className="ml-3 cursor-pointer flex-grow"
+                            >
+                              <div className="text-gray-600 mt-1">
+                                {option.display_text}
+                              </div>
+                            </Label>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </RadioGroup>
+
+                  <div className="mt-6 pt-4 border-t border-gray-100">
+                    <Button
+                      onClick={handleNextQuestion}
+                      disabled={!selectedOption}
+                      className="w-full bg-[#DB5461] hover:bg-[#c64854] text-white flex items-center justify-center gap-2 py-6"
+                      size="lg"
+                    >
+                      {!isLastQuestion ? (
+                        <>
+                          Submit & Continue
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      ) : (
+                        "Submit & Finish Section"
+                      )}
+                    </Button>
+
+                    <p className="text-xs text-center text-gray-500 mt-2">
+                      {!selectedOption
+                        ? "Please select an answer to continue"
+                        : "Your answer will be saved automatically"}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </MathJaxContext>
   );
 }
