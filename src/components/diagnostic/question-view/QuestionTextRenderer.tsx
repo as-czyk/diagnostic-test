@@ -4,19 +4,17 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useQuestionControllerStore } from "@/stores";
 import { QuestionUtils } from "@/utils/QuestionUtils";
+import { MathJax } from "better-react-mathjax";
 
 export const QuestionTextRenderer = (props: { question: any }) => {
   const { question } = props;
   const { getCurrentQuestionIndex } = useQuestionControllerStore();
-  console.log(question.math);
 
   const text = QuestionUtils.replaceMathExpressions(
     question.text,
     question?.math,
     "latex"
   );
-
-  console.log(text);
 
   return (
     <Card className="flex-1 lg:w-1/2 overflow-hidden">
@@ -31,7 +29,9 @@ export const QuestionTextRenderer = (props: { question: any }) => {
 
         {/* Scrollable Question Container */}
         <div className="overflow-y-auto flex-grow pr-2 mb-4 max-h-[calc(100vh-300px)]">
-          <p className="text-gray-800 text-lg leading-relaxed">{text}</p>
+          <MathJax inline>
+            <p className="text-gray-800 text-lg leading-relaxed">{text}</p>
+          </MathJax>
         </div>
       </div>
     </Card>

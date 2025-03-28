@@ -2,6 +2,8 @@
 
 import { RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { MathJax } from "better-react-mathjax";
+import { QuestionUtils } from "@/utils/QuestionUtils";
 
 export const ChoicesRenderer = (props: {
   choices: any[];
@@ -29,7 +31,19 @@ export const ChoicesRenderer = (props: {
               htmlFor={`option-${option.value}`}
               className="ml-3 cursor-pointer flex-grow"
             >
-              <div className="text-gray-600 mt-1">{option.display_text}</div>
+              {option?.math ? (
+                <MathJax inline>
+                  <p className="text-gray-600 mt-1">
+                    {QuestionUtils.replaceMathExpressions(
+                      option.display_text,
+                      option.math,
+                      "latex"
+                    )}
+                  </p>
+                </MathJax>
+              ) : (
+                <div className="text-gray-600 mt-1">{option.display_text}</div>
+              )}
             </Label>
           </div>
         </div>

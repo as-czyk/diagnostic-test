@@ -1,12 +1,12 @@
 export const QuestionUtils = {
   replaceMathExpressions: (
     str: string,
-    mathExpressions: any,
+    mathExpressions: { [key: string]: { unicode: string; latex: string } },
     mode: "unicode" | "latex" = "latex"
   ): string => {
-    return str.replace(/{{(.*?)}}/g, (_, key) => {
+    return str.replace(/{{(.*?)}}/g, (_, key: string) => {
       if (mode === "unicode") return mathExpressions[key]?.unicode;
-      return `** ${mathExpressions[key]?.[mode]} **`;
+      return `** ${mathExpressions[key.trim()]?.latex} **`;
     });
   },
 };
