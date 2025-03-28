@@ -1,10 +1,9 @@
+import ExamAnalysis from "@/components/custom/exam-analysis";
 import { SupabaseApi } from "@/supabase/SupabaseApi";
+import { createSupabaseAdminClient } from "@/supabase/admin";
 import { getExamById } from "@/supabase/db/exam/api";
 import { getSatQuestionById } from "@/supabase/db/sat-questions/api";
-import { createSupabaseServerClient } from "@/supabase/server";
 import { prepareExamDataServer } from "@/utils/prepare-exam-data";
-import ExamAnalysis from "@/components/custom/exam-analysis";
-import { createSupabaseAdminClient } from "@/supabase/admin";
 
 export default async function ExamPage(props: {
   params: Promise<{ id: string }>;
