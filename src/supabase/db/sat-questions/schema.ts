@@ -21,17 +21,7 @@ export const QuestionContentSchema = z.object({
 export type QuestionContent = z.infer<typeof QuestionContentSchema>;
 
 // Define the schema for the choices JSON field
-export const ChoicesSchema = z.object({
-  A: z.string(),
-  B: z.string(),
-  C: z.string(),
-  D: z.string(),
-  // Optional images for each choice
-  A_image_url: z.string().url().optional(),
-  B_image_url: z.string().url().optional(),
-  C_image_url: z.string().url().optional(),
-  D_image_url: z.string().url().optional(),
-});
+export const ChoicesSchema = z.any();
 export type Choices = z.infer<typeof ChoicesSchema>;
 
 // Define the schema for the sat_questions table
@@ -39,12 +29,12 @@ export const SatQuestionSchema = z.object({
   id: z.string().uuid(),
   section: SectionEnum,
   subtopic: z.string(),
-  question: QuestionContentSchema,
+  question: z.any(),
   correct_answer: AnswerEnum,
-  difficulty_level: DifficultyLevelEnum,
-  choices: ChoicesSchema,
-  created_at: z.string().datetime().optional(),
-  updated_at: z.string().datetime().optional(),
+  difficulty_level: z.number().min(1).max(5),
+  choices: z.any(),
+  created_at: z.any(),
+  updated_at: z.any(),
 });
 export type SatQuestion = z.infer<typeof SatQuestionSchema>;
 

@@ -4,6 +4,7 @@ import { getSatQuestionById } from "@/supabase/db/sat-questions/api";
 import { createSupabaseServerClient } from "@/supabase/server";
 import { prepareExamDataServer } from "@/utils/prepare-exam-data";
 import ExamAnalysis from "@/components/custom/exam-analysis";
+import { createSupabaseAdminClient } from "@/supabase/admin";
 
 export default async function ExamPage(props: {
   params: Promise<{ id: string }>;
@@ -37,11 +38,10 @@ export default async function ExamPage(props: {
   const examType = examData?.metadata?.title || "Exam";
 
   // Get user info for the student name
-  const supabase = await createSupabaseServerClient();
+  const supabase = await createSupabaseAdminClient();
   const { data: userData } = await supabase.auth.admin.getUserById(
     examResult.user_id
   );
-  console.log(userData);
 
   // Get student name from user data or use default
   const studentName =
@@ -58,5 +58,5 @@ export default async function ExamPage(props: {
   );
 
   // Return the ExamAnalysis component with the prepared data
-  return <ExamAnalysis {...analysisData} />;
+  return <ExamAnalysis {...analysisData} studentName={studentName} />;
 }

@@ -35,7 +35,6 @@ export default function UserDetailView({
 }: UserDetailProps) {
   const { user } = userData;
   const [expanded, setExpanded] = useState(false);
-  const router = useRouter();
   // Get display name (name or email)
   const displayName =
     user?.user_metadata?.first_name && user?.user_metadata?.last_name
@@ -91,8 +90,6 @@ export default function UserDetailView({
 
     return null;
   };
-
-  console.log("getActiveStep", getActiveStep());
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden max-w-6xl ml-8">
@@ -218,6 +215,12 @@ export default function UserDetailView({
             className="flex-1 bg-[#DB5461] hover:bg-[#c64854] text-white flex items-center justify-center gap-2"
             size="lg"
             disabled={!Boolean(diagnostic?.math_diagnostic_id)}
+            onClick={() => {
+              window.open(
+                `/shared/result/${diagnostic?.math_diagnostic_id}`,
+                "_blank"
+              );
+            }}
           >
             <FileText className="h-5 w-5" />
             View Math Diagnostic Results

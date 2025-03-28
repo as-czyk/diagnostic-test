@@ -119,7 +119,7 @@ const generateDummyData = (): QuestionResult[] => {
 };
 
 export default function ExamAnalysis({
-  studentName = "Alex Thompson",
+  studentName = "Student",
   examDate = new Date(),
   examType = "SAT Diagnostic Test",
   results = generateDummyData(),
@@ -681,7 +681,7 @@ export default function ExamAnalysis({
                           ) : (
                             <div className="space-y-2">
                               <div className="text-sm font-medium">
-                                Your Answer
+                                Student's Answer
                               </div>
                               <div className="p-3 rounded-md bg-gray-50 border border-gray-200">
                                 <div className="flex items-center gap-2">
