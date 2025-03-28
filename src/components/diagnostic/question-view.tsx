@@ -42,7 +42,7 @@ export default function QuestionView() {
     getCurrentQuestionIndex() === exam?.questions.length - 1;
 
   // Start timer when component mounts
-  /*useEffect(() => {
+  useEffect(() => {
     // Start timer
     timerRef.current = setInterval(() => {
       setQuestionTimer((prev) => prev + 1);
@@ -59,7 +59,7 @@ export default function QuestionView() {
   // Reset timer when question changes
   useEffect(() => {
     setQuestionTimer(0);
-  }, [currentQuestion?.id]);*/
+  }, [currentQuestion?.id]);
 
   // Handle answer selection
   const handleOptionSelect = (optionId: string) => setSelectedOption(optionId);
@@ -152,7 +152,7 @@ export default function QuestionView() {
         {/* Content */}
         <div className="flex flex-col">
           {/* Main question content */}
-          <main className="flex-grow container max-w-6xl mx-auto px-4 py-8">
+          <main className="flex-grow container max-w-6xl mx-auto px-4 py-8 min-w-[1024px]">
             <div className="flex flex-col lg:flex-row gap-6 h-full">
               {/* Question Panel - Left Side */}
               <QuestionTextRenderer question={question} />

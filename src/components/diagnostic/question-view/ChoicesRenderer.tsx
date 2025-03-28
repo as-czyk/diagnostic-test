@@ -35,8 +35,8 @@ export const ChoicesRenderer = (props: {
                 <MathJax inline>
                   <p className="text-gray-600 mt-1">
                     {QuestionUtils.replaceMathExpressions(
-                      option.display_text,
-                      option.math,
+                      option?.display_text,
+                      option?.math,
                       "latex"
                     )}
                   </p>
