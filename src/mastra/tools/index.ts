@@ -1,102 +1,137 @@
-import { createTool } from '@mastra/core/tools';
-import { z } from 'zod';
+import { createClient } from "@/supabase/client";
+import { createTool } from "@mastra/core/tools";
+import { z } from "zod";
+import htmlPdf from "html-pdf-node";
+import path from "path";
+import fs from "fs";
 
-interface GeocodingResponse {
-  results: {
-    latitude: number;
-    longitude: number;
-    name: string;
-  }[];
-}
-interface WeatherResponse {
-  current: {
-    time: string;
-    temperature_2m: number;
-    apparent_temperature: number;
-    relative_humidity_2m: number;
-    wind_speed_10m: number;
-    wind_gusts_10m: number;
-    weather_code: number;
-  };
-}
-
-export const weatherTool = createTool({
-  id: 'get-weather',
-  description: 'Get current weather for a location',
+export const getQuestionDetailsTool = createTool({
+  id: "get-question-details",
+  description: "Get the details of a question",
   inputSchema: z.object({
-    location: z.string().describe('City name'),
+    questionId: z.string().describe("The id of the question"),
   }),
   outputSchema: z.object({
-    temperature: z.number(),
-    feelsLike: z.number(),
-    humidity: z.number(),
-    windSpeed: z.number(),
-    windGust: z.number(),
-    conditions: z.string(),
-    location: z.string(),
+    data: z.any(),
+    error: z.string().optional(),
   }),
   execute: async ({ context }) => {
-    return await getWeather(context.location);
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("sat_questions")
+      .select("*")
+      .eq("id", context.questionId)
+      .single();
+    return {
+      data,
+      error: error?.message || undefined,
+    };
   },
 });
 
-const getWeather = async (location: string) => {
-  const geocodingUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1`;
-  const geocodingResponse = await fetch(geocodingUrl);
-  const geocodingData = (await geocodingResponse.json()) as GeocodingResponse;
+export const getExamResultTool = createTool({
+  id: "get-exam-result",
+  description: "Get the result of an exam for an id.",
+  inputSchema: z.object({
+    examId: z.string().describe("The id of the exam"),
+  }),
+  outputSchema: z.object({
+    data: z.any(),
+    error: z.string().optional(),
+  }),
+  execute: async ({ context }) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("exam_results")
+      .select("*")
+      .eq("id", context.examId)
+      .single();
 
-  if (!geocodingData.results?.[0]) {
-    throw new Error(`Location '${location}' not found`);
-  }
+    if (data) {
+      const enhancedData = [];
+      const { single_result } = data;
 
-  const { latitude, longitude, name } = geocodingData.results[0];
+      for (const result of single_result) {
+        const { data: questionData, error: questionError } = await supabase
+          .from("sat_questions")
+          .select("question, subtopic, difficulty_level, choices")
+          .eq("id", result.question_id)
+          .single();
 
-  const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,wind_gusts_10m,weather_code`;
+        const questionString = `Question Subtopic: ${questionData?.subtopic}, Difficulty Level: ${questionData?.difficulty_level}`;
 
-  const response = await fetch(weatherUrl);
-  const data = (await response.json()) as WeatherResponse;
+        enhancedData.push({ ...result, question: questionString });
+      }
 
-  return {
-    temperature: data.current.temperature_2m,
-    feelsLike: data.current.apparent_temperature,
-    humidity: data.current.relative_humidity_2m,
-    windSpeed: data.current.wind_speed_10m,
-    windGust: data.current.wind_gusts_10m,
-    conditions: getWeatherCondition(data.current.weather_code),
-    location: name,
-  };
-};
+      return {
+        data: enhancedData,
+        error: error?.message || undefined,
+      };
+    }
 
-function getWeatherCondition(code: number): string {
-  const conditions: Record<number, string> = {
-    0: 'Clear sky',
-    1: 'Mainly clear',
-    2: 'Partly cloudy',
-    3: 'Overcast',
-    45: 'Foggy',
-    48: 'Depositing rime fog',
-    51: 'Light drizzle',
-    53: 'Moderate drizzle',
-    55: 'Dense drizzle',
-    56: 'Light freezing drizzle',
-    57: 'Dense freezing drizzle',
-    61: 'Slight rain',
-    63: 'Moderate rain',
-    65: 'Heavy rain',
-    66: 'Light freezing rain',
-    67: 'Heavy freezing rain',
-    71: 'Slight snow fall',
-    73: 'Moderate snow fall',
-    75: 'Heavy snow fall',
-    77: 'Snow grains',
-    80: 'Slight rain showers',
-    81: 'Moderate rain showers',
-    82: 'Violent rain showers',
-    85: 'Slight snow showers',
-    86: 'Heavy snow showers',
-    95: 'Thunderstorm',
-    96: 'Thunderstorm with slight hail',
-    99: 'Thunderstorm with heavy hail',
-  };
-  return conditions[code] || 'Unknown';
-}
+    return {
+      data,
+      error: error?.message || undefined,
+    };
+  },
+});
+
+export const htmlToPdfTool = createTool({
+  id: "html-to-pdf",
+  description: "Converts HTML content to a PDF file and saves it",
+  inputSchema: z.object({
+    htmlContent: z.string().describe("The HTML content to convert to PDF"),
+    filename: z
+      .string()
+      .describe("The filename for the PDF (without extension)"),
+    options: z
+      .object({
+        format: z.enum(["A4", "Letter", "Legal"]).optional().default("A4"),
+        landscape: z.boolean().optional().default(false),
+      })
+      .optional(),
+  }),
+  outputSchema: z.object({
+    success: z.boolean(),
+    filePath: z.string().optional(),
+    error: z.string().optional(),
+  }),
+  execute: async ({ context }) => {
+    try {
+      // Ensure the public/pdfs directory exists
+      const pdfDir = path.join(process.cwd(), "public", "pdfs");
+      if (!fs.existsSync(pdfDir)) {
+        fs.mkdirSync(pdfDir, { recursive: true });
+      }
+
+      // Set up the options
+      const options = {
+        format: context.options?.format || "A4",
+        landscape: context.options?.landscape || false,
+      };
+
+      // Create the PDF
+      const file = { content: context.htmlContent };
+      const pdfBuffer = await htmlPdf.generatePdf(file, options);
+
+      // Save the PDF
+      const sanitizedFilename = context.filename
+        .replace(/[^a-z0-9]/gi, "_")
+        .toLowerCase();
+      const filePath = path.join(pdfDir, `${sanitizedFilename}.pdf`);
+      fs.writeFileSync(filePath, pdfBuffer);
+
+      // Return success and the relative path to the PDF
+      return {
+        success: true,
+        filePath: `/pdfs/${sanitizedFilename}.pdf`,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : "An unknown error occurred",
+      };
+    }
+  },
+});
