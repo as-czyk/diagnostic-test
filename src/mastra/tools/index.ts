@@ -4,6 +4,9 @@ import { z } from "zod";
 import htmlPdf from "html-pdf-node";
 import path from "path";
 import fs from "fs";
+import { fillStudyPlanTemplateTool } from "./studyPlanTools";
+
+export { fillStudyPlanTemplateTool };
 
 export const getQuestionDetailsTool = createTool({
   id: "get-question-details",

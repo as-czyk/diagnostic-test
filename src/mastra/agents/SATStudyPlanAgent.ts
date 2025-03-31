@@ -1,6 +1,11 @@
 import { openai } from "@ai-sdk/openai";
 import { Agent } from "@mastra/core/agent";
-import { getExamResultTool, getQuestionDetailsTool } from "../tools";
+import {
+  fillStudyPlanTemplateTool,
+  getExamResultTool,
+  getQuestionDetailsTool,
+  htmlToPdfTool,
+} from "../tools";
 
 export const SatStudyPlanAgent = new Agent({
   name: "SAT Personalized Study Plan Agent",
@@ -9,7 +14,7 @@ export const SatStudyPlanAgent = new Agent({
         1. Their diagnostic test scores in Math and English
         2. Their target exam date
         3. The official SAT curriculum
-        4. Available practice questions from the database
+        4. Available exam results from the database
 
         When creating a study plan:
         - Analyze the student's strengths and weaknesses based on their scores
@@ -22,11 +27,16 @@ export const SatStudyPlanAgent = new Agent({
 
         Use the available tools to:
         1. Fetch relevant practice questions
-        2. Generate the study plan
-        3. Export the plan in the requested format
+        2. Fetch the relevant exam results
+        3. Convert a html template to a pdf
 
         Always maintain a supportive and encouraging tone while being realistic about the work required.
 `,
   model: openai("gpt-4"),
-  tools: { getQuestionDetailsTool, getExamResultTool },
+  tools: {
+    getQuestionDetailsTool,
+    getExamResultTool,
+    htmlToPdf: htmlToPdfTool,
+    fillStudyPlanTemplate: fillStudyPlanTemplateTool,
+  },
 });
