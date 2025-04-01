@@ -12,6 +12,7 @@ export const StudyPlanWorkflow = new Workflow({
     targetScore: z.number(),
     math_diagnostic_id: z.string(),
     verbal_diagnostic_id: z.string(),
+    userId: z.string(),
   }),
 });
 
@@ -77,9 +78,11 @@ const PDFGenerationStep = new Step({
   id: "pdf-generation-step",
   execute: async ({ context }) => {
     const { html } = context.getStepResult("html-conversion-step");
+    const { userId } = context.triggerData;
 
     const result = await PdfGeneratorAgent.generate(`
-        Convert the following HTML to a PDF: ${html}
+        Generate a PDF document with the name ${userId}.pdf and save it to the studyplan bucket in supabase.
+        Use the following HTML as the content for the PDF: ${html}
         `);
 
     return {

@@ -26,6 +26,7 @@ export default async function GenerateResult() {
       targetScore: userData?.sat_metadata.desired_score!,
       math_diagnostic_id: diagnosticData?.math_diagnostic_id!,
       verbal_diagnostic_id: diagnosticData?.verbal_diagnostic_id!,
+      userId: data.user?.id!,
     },
   });
 
