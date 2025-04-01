@@ -1,9 +1,8 @@
 import { createClient } from "@/supabase/client";
+import { createMastraSupabaseAdminClient } from "@/supabase/mastra";
 import { createTool } from "@mastra/core/tools";
-import { z } from "zod";
 import htmlPdf from "html-pdf-node";
-import path from "path";
-import fs from "fs";
+import { z } from "zod";
 
 export const getQuestionDetailsTool = createTool({
   id: "get-question-details",
@@ -76,14 +75,13 @@ export const getExamResultTool = createTool({
   },
 });
 
-export const htmlToPdfTool = createTool({
-  id: "html-to-pdf",
-  description: "Converts HTML content to a PDF file and saves it",
+export const generateAndSavePdfTool = createTool({
+  id: "generate-and-save-pdf",
+  description:
+    "Generates PDF from HTML and saves it directly to Supabase storage",
   inputSchema: z.object({
     htmlContent: z.string().describe("The HTML content to convert to PDF"),
-    filename: z
-      .string()
-      .describe("The filename for the PDF (without extension)"),
+    fileName: z.string().describe("Name to save the file as in the bucket"),
     options: z
       .object({
         format: z.enum(["A4", "Letter", "Legal"]).optional().default("A4"),
@@ -93,16 +91,12 @@ export const htmlToPdfTool = createTool({
   }),
   outputSchema: z.object({
     success: z.boolean(),
-    filePath: z.string().optional(),
+    url: z.string().optional(),
     error: z.string().optional(),
   }),
   execute: async ({ context }) => {
     try {
-      // Ensure the public/pdfs directory exists
-      const pdfDir = path.join(process.cwd(), "public", "pdfs");
-      if (!fs.existsSync(pdfDir)) {
-        fs.mkdirSync(pdfDir, { recursive: true });
-      }
+      const supabase = await createMastraSupabaseAdminClient();
 
       // Set up the options
       const options = {
@@ -110,27 +104,41 @@ export const htmlToPdfTool = createTool({
         landscape: context.options?.landscape || false,
       };
 
-      // Create the PDF
+      // Generate PDF buffer
       const file = { content: context.htmlContent };
       const pdfBuffer = await htmlPdf.generatePdf(file, options);
 
-      // Save the PDF
-      const sanitizedFilename = context.filename
-        .replace(/[^a-z0-9]/gi, "_")
-        .toLowerCase();
-      const filePath = path.join(pdfDir, `${sanitizedFilename}.pdf`);
-      fs.writeFileSync(filePath, pdfBuffer);
+      // Convert buffer to blob
+      const pdfBlob = new Blob([pdfBuffer], { type: "application/pdf" });
 
-      // Return success and the relative path to the PDF
+      // Upload to Supabase
+      const { data, error } = await supabase.storage
+        .from("studyplan")
+        .upload(`studyplan/${context?.fileName}`, pdfBlob, {
+          contentType: "application/pdf",
+        });
+
+      console.log("DATA", data);
+      console.log("ERROR", error);
+
+      if (error) throw error;
+
+      // Get the public URL
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("studyplan").getPublicUrl(context.fileName);
+
       return {
         success: true,
-        filePath: `/pdfs/${sanitizedFilename}.pdf`,
+        url: publicUrl,
       };
     } catch (error) {
       return {
         success: false,
         error:
-          error instanceof Error ? error.message : "An unknown error occurred",
+          error instanceof Error
+            ? error.message
+            : "Failed to generate and save PDF",
       };
     }
   },

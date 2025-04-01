@@ -1,4 +1,4 @@
-import { Step, Workflow } from "@mastra/core";
+import { Step, Workflow } from "@mastra/core/workflows";
 import { z } from "zod";
 import { PdfGeneratorAgent, SatStudyPlanAgent } from "../agents";
 import { createOpenAI } from "@ai-sdk/openai";
@@ -70,16 +70,16 @@ const PDFGenerationStep = new Step({
   execute: async ({ context }) => {
     const { html } = context.getStepResult("html-conversion-step");
 
-    const pdf = await PdfGeneratorAgent.generate(`
+    const result = await PdfGeneratorAgent.generate(`
         Convert the following HTML to a PDF: ${html}
         `);
 
-    console.log("PDF", pdf);
+    console.log("PDF", result);
 
     return {
       success: true,
       message: "PDF generation successful",
-      data: pdf,
+      data: result,
     };
   },
 });

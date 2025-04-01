@@ -1,6 +1,6 @@
 import { openai } from "@ai-sdk/openai";
 import { Agent } from "@mastra/core/agent";
-import { htmlToPdfTool } from "../tools";
+import { generateAndSavePdfTool } from "../tools";
 
 export const PdfGeneratorAgent = new Agent({
   name: "PDF Generator Agent",
@@ -21,5 +21,5 @@ export const PdfGeneratorAgent = new Agent({
     Always validate the HTML before conversion and ensure the document looks professional.
   `,
   model: openai("gpt-4"),
-  tools: { htmlToPdf: htmlToPdfTool },
+  tools: { generateAndSavePdfTool },
 });
