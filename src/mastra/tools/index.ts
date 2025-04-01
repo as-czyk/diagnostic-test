@@ -114,12 +114,9 @@ export const generateAndSavePdfTool = createTool({
       // Upload to Supabase
       const { data, error } = await supabase.storage
         .from("studyplan")
-        .upload(`studyplan/${context?.fileName}`, pdfBlob, {
+        .upload(context?.fileName, pdfBlob, {
           contentType: "application/pdf",
         });
-
-      console.log("DATA", data);
-      console.log("ERROR", error);
 
       if (error) throw error;
 

@@ -9,7 +9,7 @@ export const StudyPlanWorkflow = new Workflow({
   triggerSchema: z.object({
     studentName: z.string(),
     examDate: z.string(),
-    targetScore: z.string(),
+    targetScore: z.number(),
     math_diagnostic_id: z.string(),
     verbal_diagnostic_id: z.string(),
   }),
@@ -30,8 +30,11 @@ const StudyPlanStep = new Step({
         Generate a personalized study plan for ${studentName} to achieve a score of ${targetScore} on the SAT by ${examDate}.
 
         Use the following diagnostic results to create the study plan:
+
         Math Diagnostic ID: ${math_diagnostic_id}
         Verbal Diagnostic ID: ${verbal_diagnostic_id}
+
+        Analyse the performances of the student in each of the sections and draft a study plans as your instructions say.
         
     `);
 
@@ -54,6 +57,11 @@ const HTMLConversionStep = new Step({
 
     const result = await generateText({
       model: openai("gpt-4"),
+      system: `
+        You are an expert in converting markdown to HTML.
+
+        Your output should be a well-structured HTML document with a modern look and feel. Follow the layout from the markdown.
+      `,
       prompt: `Convert the following markdown to HTML: ${markdown}`,
     });
 
@@ -73,8 +81,6 @@ const PDFGenerationStep = new Step({
     const result = await PdfGeneratorAgent.generate(`
         Convert the following HTML to a PDF: ${html}
         `);
-
-    console.log("PDF", result);
 
     return {
       success: true,

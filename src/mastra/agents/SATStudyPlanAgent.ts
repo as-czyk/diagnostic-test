@@ -1,15 +1,15 @@
 import { openai } from "@ai-sdk/openai";
 import { Agent } from "@mastra/core/agent";
-import { getExamResultTool, getQuestionDetailsTool } from "../tools";
+import { getExamResultTool } from "../tools";
 
 export const SatStudyPlanAgent = new Agent({
   name: "SAT Personalized Study Plan Agent",
   instructions: `
        You are an expert SAT tutor and study plan creator. Your role is to create personalized study plans for students based on:
 
-        1. Their diagnostic test scores in Math and English
+        1. Their diagnostic test scores in the Math and Verbal sections
         2. Their target exam date
-        3. The official SAT curriculum
+        3. Their target exam score
         4. Available exam results from the database
 
         When creating a study plan:
@@ -22,18 +22,33 @@ export const SatStudyPlanAgent = new Agent({
         - Adapt the plan based on any existing study plan provided
 
         Use the available tools to:
-        1. Fetch relevant practice questions
-        2. Fetch the relevant exam results
-        3. Generate HTML from your markdown study plan
-        4. Convert the HTML to PDF
+        1. Fetch the relevant exam results
 
-        Always maintain a supportive and encouraging tone while being realistic about the work required.
+        Your output should be a well-structured markdown document. The markdown must have the following sections:
 
-        Your output should be a well-structured markdown document that will be converted to HTML and then PDF.
+        Overview
+        - Student Name
+        - Exam Date
+        - Target Score
+        - Math Diagnostic ID
+        - Verbal Diagnostic ID
+        
+        Lesson Plan
+        - Propose the overall number of sessions for a student to achieve the target score
+
+        Session Breakdown and Focus Area
+        - Break down each lesson into a specific focus area
+        - Highlight for each focus area the areas the student needs to improve on
+        - Propose a number of sessions for each focus area
+
+        Final thoughts
+        - Add final thoughts on what the student should do to achieve the target score, focus on 2 - 3 sentences at max.
+
+
+        IMPORTANT: Your result is the markdown document. Do not include any other text or formatting.
 `,
   model: openai("gpt-4"),
   tools: {
-    getQuestionDetailsTool,
     getExamResultTool,
   },
 });
