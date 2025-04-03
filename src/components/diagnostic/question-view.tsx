@@ -1,7 +1,6 @@
 "use client";
 
 import { updateDiagnostic } from "@/actions/diagnostic-actions";
-import { Button } from "@/components/ui/button";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { ExamId } from "@/constants/Constants";
 import { Routes } from "@/routes/Routes";
@@ -10,14 +9,12 @@ import { useQuestionControllerStore } from "@/stores/useQuestionControllerStore"
 import { useTimerStore } from "@/stores/useTimerStore";
 import { ClientApi } from "@/supabase/ClientApi";
 import { MathJaxContext } from "better-react-mathjax";
-import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Card } from "../ui/card";
-import { Separator } from "../ui/separator";
 import { ChoicesRenderer } from "./question-view/ChoicesRenderer";
-import { SubmitRenderer } from "./question-view/SubmitRenderer";
 import { QuestionTextRenderer } from "./question-view/QuestionTextRenderer";
+import { SubmitRenderer } from "./question-view/SubmitRenderer";
 
 export default function QuestionView() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
