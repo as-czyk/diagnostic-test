@@ -1,8 +1,9 @@
+import { createOpenAI } from "@ai-sdk/openai";
 import { Step, Workflow } from "@mastra/core/workflows";
 import { z } from "zod";
 import { PdfGeneratorAgent, SatStudyPlanAgent } from "../agents";
-import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
+import { marked } from "marked";
 
 export const StudyPlanWorkflow = new Workflow({
   name: "Study Plan Workflow",
@@ -27,7 +28,8 @@ const StudyPlanStep = new Step({
       verbal_diagnostic_id,
     } = context.triggerData;
 
-    const result = await SatStudyPlanAgent.generate(`
+    const result = await SatStudyPlanAgent.generate(
+      `
         Generate a personalized study plan for ${studentName} to achieve a score of ${targetScore} on the SAT by ${examDate}.
 
         Use the following diagnostic results to create the study plan:
@@ -37,12 +39,13 @@ const StudyPlanStep = new Step({
 
         Analyse the performances of the student in each of the sections and draft a study plans as your instructions say.
         
-    `);
+    `
+    );
 
     return {
       success: true,
       message: "Study plan generated successfully",
-      markdown: result.text,
+      studyPlan: result.text,
     };
   },
 });
@@ -50,26 +53,15 @@ const StudyPlanStep = new Step({
 const HTMLConversionStep = new Step({
   id: "html-conversion-step",
   execute: async ({ context }) => {
-    const { markdown } = context.getStepResult("study-plan-step");
+    const { studyPlan } = context.getStepResult("study-plan-step");
 
-    const openai = createOpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-
-    const result = await generateText({
-      model: openai("gpt-4"),
-      system: `
-        You are an expert in converting markdown to HTML.
-
-        Your output should be a well-structured HTML document with a modern look and feel. Follow the layout from the markdown.
-      `,
-      prompt: `Convert the following markdown to HTML: ${markdown}`,
-    });
+    const html = await marked.parse(studyPlan);
+    console.log(html);
 
     return {
       success: true,
       message: "HTML conversion successful",
-      html: result.text,
+      html: html,
     };
   },
 });

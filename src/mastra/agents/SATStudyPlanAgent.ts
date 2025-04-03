@@ -1,6 +1,7 @@
 import { openai } from "@ai-sdk/openai";
 import { Agent } from "@mastra/core/agent";
 import { getExamResultTool } from "../tools";
+import { z } from "zod";
 
 export const SatStudyPlanAgent = new Agent({
   name: "SAT Personalized Study Plan Agent",
@@ -30,24 +31,21 @@ export const SatStudyPlanAgent = new Agent({
         - Student Name
         - Exam Date
         - Target Score
-        - Math Diagnostic ID
-        - Verbal Diagnostic ID
         
         Lesson Plan
-        - Propose the overall number of sessions for a student to achieve the target score
+        - Propose the overall number of sessions for a student to achieve the target score for both Math and Verbal
 
         Session Breakdown and Focus Area
         - Break down each lesson into a specific focus area
+        - each lesson should have a clear objecttive, a description and a title
         - Highlight for each focus area the areas the student needs to improve on
-        - Propose a number of sessions for each focus area
 
         Final thoughts
         - Add final thoughts on what the student should do to achieve the target score, focus on 2 - 3 sentences at max.
 
-
         IMPORTANT: Your result is the markdown document. Do not include any other text or formatting.
 `,
-  model: openai("gpt-4"),
+  model: openai("gpt-4o-mini"),
   tools: {
     getExamResultTool,
   },
