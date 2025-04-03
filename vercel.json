@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "api/generate-pdf": {
-      "maxDuration": 30
-    }
-  }
-}
