@@ -125,31 +125,35 @@ export const getExamResultTool = async (id: string) => {
 const generatePdf = async (html: string) => {
   let browser = null;
 
-  if (process.env.NODE_ENV === "production") {
-    browser = await puppeteer.launch({
-      args: [...chromium.args, "--no-sandbox", "--disable-setuid-sandbox"],
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-      ignoreHTTPSErrors: true,
+  try {
+    if (process.env.NODE_ENV === "production") {
+      browser = await puppeteer.launch({
+        args: [...chromium.args, "--no-sandbox", "--disable-setuid-sandbox"],
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+        ignoreHTTPSErrors: true,
+      });
+    } else {
+      browser = await puppeteer.launch({
+        headless: true,
+        executablePath:
+          "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      });
+    }
+
+    const page = await browser.newPage();
+    await page.setContent(html);
+
+    const pdfBuffer = await page.pdf({
+      format: "a4",
+      printBackground: true,
     });
-  } else {
-    browser = await puppeteer.launch({
-      headless: true,
-      executablePath:
-        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-    });
+
+    await browser.close();
+
+    return pdfBuffer;
+  } catch (e) {
+    console.log(e);
   }
-
-  const page = await browser.newPage();
-  await page.setContent(html);
-
-  const pdfBuffer = await page.pdf({
-    format: "a4",
-    printBackground: true,
-  });
-
-  await browser.close();
-
-  return pdfBuffer;
 };
