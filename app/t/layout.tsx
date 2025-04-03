@@ -17,12 +17,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </header>
         <nav
           className={
-            "border-r bg-background col-start-1 col-end-1 row-start-1 row-end-8 sidebar group w-12 overflow-hidden transition-all duration-300 ease-linear text-whiteColor hover:w-48 hover:z-10"
+            "border-r bg-background col-start-1 col-end-1 row-start-1 row-end-8 sidebar group w-12 overflow-hidden transition-all duration-300 ease-linear text-whiteColor hover:w-48 hover:z-10 sticky top-0 h-screen"
           }
         >
           <Sidebar />
         </nav>
-        <main className="col-start-2 col-end-8 row-start-2 row-end-8 mt-8">
+        <main className="col-start-2 col-end-8 row-start-2 row-end-8 mt-8 overflow-y-auto">
           {children}
         </main>
       </main>

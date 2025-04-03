@@ -13,21 +13,23 @@ const navLinks: any = [
 ];
 export const Sidebar = () => {
   return (
-    <ul className="flex flex-col items-center justify-start h-full">
-      {navLinks.map((navElement: any, index: any) => {
-        return (
-          <Link
-            key={index}
-            href={navElement.ref}
-            className={`flex items-center w-full p-4 hover:bg-primary-light cursor-pointer`}
-          >
-            <span className="flex-shrink-0">{navElement.icon}</span>
-            <p className=" text-black ml-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 whitespace-nowrap ease-linear text-sm">
-              {navElement.text}
-            </p>
-          </Link>
-        );
-      })}
-    </ul>
+    <div className="sticky top-0 h-screen">
+      <ul className="flex flex-col items-center justify-start h-full">
+        {navLinks.map((navElement: any, index: any) => {
+          return (
+            <Link
+              key={index}
+              href={navElement.ref}
+              className={`flex items-center w-full p-4 hover:bg-primary-light cursor-pointer`}
+            >
+              <span className="flex-shrink-0">{navElement.icon}</span>
+              <p className=" text-black ml-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 whitespace-nowrap ease-linear text-sm">
+                {navElement.text}
+              </p>
+            </Link>
+          );
+        })}
+      </ul>
+    </div>
   );
 };

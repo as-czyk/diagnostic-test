@@ -16,6 +16,7 @@ import { startTransition, useState, useTransition } from "react";
 import { Button } from "../ui/button";
 import ProcessIndicator from "./process-indicator";
 import { createPersonalizedPlan } from "@/actions/gen-ai-actions";
+import ReactMarkdown from "react-markdown";
 
 // Skeleton component for loading states
 const Skeleton = ({ className = "", ...props }) => {
@@ -36,6 +37,8 @@ export default function UserDetailView({
   const { user } = userData;
   const [expanded, setExpanded] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [markdown, setMarkdown] = useState<string | null>(null);
+  //#endregion
   // Get display name (name or email)
   const displayName =
     user?.user_metadata?.first_name && user?.user_metadata?.last_name
@@ -94,7 +97,7 @@ export default function UserDetailView({
 
   const handleStudyPlan = async () => {
     startTransition(async () => {
-      const base64 = await createPersonalizedPlan(
+      const markdown = await createPersonalizedPlan(
         user?.user_metadata?.first_name,
         userProfile?.sat_metadata?.desired_score,
         userProfile?.sat_metadata?.exam_date,
@@ -102,14 +105,7 @@ export default function UserDetailView({
         diagnostic?.verbal_diagnostic_id
       );
 
-      if (!base64) {
-        return;
-      }
-
-      const pdfBuffer = Buffer.from(base64, "base64");
-      const blob = new Blob([pdfBuffer], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
+      setMarkdown(markdown);
     });
   };
 
@@ -274,16 +270,17 @@ export default function UserDetailView({
             size="lg"
             onClick={() => handleStudyPlan()}
             isLoading={pending}
+            disabled={
+              !!Boolean(diagnostic?.verbal_diagnostic_id) &&
+              !Boolean(diagnostic?.math_diagnostic_id)
+            }
           >
             <BookOpen className="h-5 w-5" />
             View Study Plan
-            {!!Boolean(diagnostic?.verbal_diagnostic_id) &&
-              !Boolean(diagnostic?.math_diagnostic_id) && (
-                <span className="text-xs">(Incomplete)</span>
-              )}
           </Button>
         </div>
       </div>
+      {markdown && <ReactMarkdown children={markdown} />}
     </div>
   );
 }

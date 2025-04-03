@@ -2,10 +2,9 @@
 
 import { createSupabaseServerClient } from "@/supabase/server";
 import { createOpenAI } from "@ai-sdk/openai";
-import { generateText } from "ai";
-import { marked } from "marked";
-import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
+import { generateText } from "ai";
+import puppeteer from "puppeteer-core";
 
 export async function createPersonalizedPlan(
   studentName: string,
@@ -36,10 +35,11 @@ export async function createPersonalizedPlan(
     `,
   });
 
-  const html = await marked.parse(result.text);
-  const pdfBuffer = await generatePdf(html);
+  //const html = await marked.parse(result.text);
+  //const pdfBuffer = await generatePdf(html);
 
-  return pdfBuffer?.toString("base64");
+  //return pdfBuffer?.toString("base64");
+  return result.text;
 }
 
 const SystemPrompt = `
