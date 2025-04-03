@@ -94,7 +94,7 @@ export default function UserDetailView({
 
   const handleStudyPlan = async () => {
     startTransition(async () => {
-      const pdfBuffer = await createPersonalizedPlan(
+      const pdfBuffer: any = await createPersonalizedPlan(
         user?.user_metadata?.first_name,
         userProfile?.sat_metadata?.desired_score,
         userProfile?.sat_metadata?.exam_date,
