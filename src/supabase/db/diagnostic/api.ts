@@ -1,11 +1,10 @@
 import { createSupabaseServerClient } from "../../server";
-import { createSupabaseAdminClient } from "../../admin";
 import {
-  Diagnostic,
-  DiagnosticSchema,
   CreateDiagnostic,
-  UpdateDiagnostic,
+  Diagnostic,
   DIAGNOSTIC_TABLE,
+  DiagnosticSchema,
+  UpdateDiagnostic,
 } from "./schema";
 
 /**
