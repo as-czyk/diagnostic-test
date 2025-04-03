@@ -39,7 +39,7 @@ export async function createPersonalizedPlan(
   const html = await marked.parse(result.text);
   const pdfBuffer = await generatePdf(html);
 
-  return pdfBuffer;
+  return pdfBuffer?.toString("base64");
 }
 
 const SystemPrompt = `

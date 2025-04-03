@@ -94,7 +94,7 @@ export default function UserDetailView({
 
   const handleStudyPlan = async () => {
     startTransition(async () => {
-      const pdfBuffer: any = await createPersonalizedPlan(
+      const base64 = await createPersonalizedPlan(
         user?.user_metadata?.first_name,
         userProfile?.sat_metadata?.desired_score,
         userProfile?.sat_metadata?.exam_date,
@@ -102,6 +102,11 @@ export default function UserDetailView({
         diagnostic?.verbal_diagnostic_id
       );
 
+      if (!base64) {
+        return;
+      }
+
+      const pdfBuffer = Buffer.from(base64, "base64");
       const blob = new Blob([pdfBuffer], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       window.open(url, "_blank");
