@@ -12,7 +12,7 @@ import {
   Target,
   User as UserIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { startTransition, useState, useTransition } from "react";
 import { Button } from "../ui/button";
 import ProcessIndicator from "./process-indicator";
 import { createPersonalizedPlan } from "@/actions/gen-ai-actions";
@@ -35,6 +35,7 @@ export default function UserDetailView({
 }: UserDetailProps) {
   const { user } = userData;
   const [expanded, setExpanded] = useState(false);
+  const [pending, startTransition] = useTransition();
   // Get display name (name or email)
   const displayName =
     user?.user_metadata?.first_name && user?.user_metadata?.last_name
@@ -92,17 +93,19 @@ export default function UserDetailView({
   };
 
   const handleStudyPlan = async () => {
-    const pdfBuffer = await createPersonalizedPlan(
-      user?.user_metadata?.first_name,
-      userProfile?.sat_metadata?.desired_score,
-      userProfile?.sat_metadata?.exam_date,
-      diagnostic?.math_diagnostic_id,
-      diagnostic?.verbal_diagnostic_id
-    );
+    startTransition(async () => {
+      const pdfBuffer = await createPersonalizedPlan(
+        user?.user_metadata?.first_name,
+        userProfile?.sat_metadata?.desired_score,
+        userProfile?.sat_metadata?.exam_date,
+        diagnostic?.math_diagnostic_id,
+        diagnostic?.verbal_diagnostic_id
+      );
 
-    const blob = new Blob([pdfBuffer], { type: "application/pdf" });
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
+      const blob = new Blob([pdfBuffer], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    });
   };
 
   return (
@@ -265,6 +268,7 @@ export default function UserDetailView({
             className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-2"
             size="lg"
             onClick={() => handleStudyPlan()}
+            isLoading={pending}
           >
             <BookOpen className="h-5 w-5" />
             View Study Plan
