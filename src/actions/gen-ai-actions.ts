@@ -1,11 +1,11 @@
 "use server";
 
-import { marked } from "marked";
 import { createSupabaseServerClient } from "@/supabase/server";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
-import chromium from "@sparticuz/chromium";
+import { marked } from "marked";
 import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 
 export async function createPersonalizedPlan(
   studentName: string,
@@ -127,10 +127,11 @@ const generatePdf = async (html: string) => {
 
   if (process.env.NODE_ENV === "production") {
     browser = await puppeteer.launch({
-      args: chromium.args,
+      args: [...chromium.args, "--no-sandbox", "--disable-setuid-sandbox"],
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
-      headless: true,
+      headless: chromium.headless,
+      ignoreHTTPSErrors: true,
     });
   } else {
     browser = await puppeteer.launch({
