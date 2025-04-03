@@ -1,6 +1,6 @@
 {
   "functions": {
-    "src/actions/gen-ai-actions.ts": {
+    "src/actions/gen-ai-actions": {
       "maxDuration": 60
     }
   }
