@@ -1,4 +1,3 @@
-import { StudyPlanWorkflow } from "@/mastra/workflows";
 import { Routes } from "@/routes/Routes";
 import { getDiagnosticByUserId } from "@/supabase/db/diagnostic";
 import { getUserProfileByUserId } from "@/supabase/db/user-profile";
@@ -6,7 +5,6 @@ import { createSupabaseServerClient } from "@/supabase/server";
 import { redirect } from "next/navigation";
 
 export default async function GenerateResult() {
-  const { start } = StudyPlanWorkflow.createRun();
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.getUser();
   const { data: userData, error: userError } = await getUserProfileByUserId(
@@ -16,7 +14,7 @@ export default async function GenerateResult() {
   const { data: diagnosticData, error: diagnosticError } =
     await getDiagnosticByUserId(data.user?.id!);
 
-  const res = await start({
+  /*const res = await start({
     triggerData: {
       studentName:
         data.user?.user_metadata.first_name +
@@ -28,9 +26,7 @@ export default async function GenerateResult() {
       verbal_diagnostic_id: diagnosticData?.verbal_diagnostic_id!,
       userId: data.user?.id!,
     },
-  });
-
-  console.log(res);
+  });*/
 
   redirect(Routes.BookingPage);
 }
