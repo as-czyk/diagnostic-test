@@ -13,9 +13,9 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import { useState } from "react";
-import ProcessIndicator from "./process-indicator";
 import { Button } from "../ui/button";
-import { useRouter } from "next/navigation";
+import ProcessIndicator from "./process-indicator";
+import { createPersonalizedPlan } from "@/actions/gen-ai-actions";
 
 // Skeleton component for loading states
 const Skeleton = ({ className = "", ...props }) => {
@@ -89,6 +89,20 @@ export default function UserDetailView({
     }
 
     return null;
+  };
+
+  const handleStudyPlan = async () => {
+    const pdfBuffer = await createPersonalizedPlan(
+      user?.user_metadata?.first_name,
+      userProfile?.sat_metadata?.desired_score,
+      userProfile?.sat_metadata?.exam_date,
+      diagnostic?.math_diagnostic_id,
+      diagnostic?.verbal_diagnostic_id
+    );
+
+    const blob = new Blob([pdfBuffer], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
   };
 
   return (
@@ -250,6 +264,7 @@ export default function UserDetailView({
           <Button
             className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-2"
             size="lg"
+            onClick={() => handleStudyPlan()}
           >
             <BookOpen className="h-5 w-5" />
             View Study Plan
